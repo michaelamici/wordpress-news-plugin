@@ -57,6 +57,7 @@ class RoleSwitcher {
         wp_enqueue_script('jquery');
         wp_enqueue_style('wp-admin');
     }
+
     
     /**
      * Render the role switcher page
