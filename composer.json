@@ -1,0 +1,45 @@
+{
+    "name": "new-baltimore-gazette/news-plugin",
+    "description": "WordPress plugin for The New Baltimore Gazette news management",
+    "type": "wordpress-plugin",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "New Baltimore Gazette",
+            "email": "dev@newbaltimoregazette.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5",
+        "yoast/phpunit-polyfills": "^1.0",
+        "brain/monkey": "^2.6",
+        "mockery/mockery": "^1.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "NewsPlugin\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "NewsPlugin\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "test-unit": "phpunit --testsuite=unit",
+        "test-integration": "phpunit --testsuite=integration",
+        "test-smoke": "phpunit --testsuite=smoke",
+        "test-coverage": "phpunit --coverage-html tests/coverage/html",
+        "test-coverage-text": "phpunit --coverage-text",
+        "test-watch": "phpunit --watch",
+        "install-wp-tests": "bash tests/bin/install-wp-tests.sh"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    }
+}
