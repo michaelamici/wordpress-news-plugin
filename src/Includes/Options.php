@@ -28,8 +28,7 @@ class Options {
      * Initialize options management
      */
     public function __construct() {
-        add_action('init', [$this, 'register_options']);
-        add_action('admin_init', [$this, 'register_options']);
+        $this->register_options();
     }
     
     /**

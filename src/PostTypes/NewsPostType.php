@@ -27,8 +27,8 @@ class NewsPostType {
      * Initialize the post type
      */
     public function __construct() {
-        add_action('init', [$this, 'register_post_type'], 10);
-        add_action('init', [$this, 'register_post_meta'], 10);
+        $this->register_post_type();
+        $this->register_post_meta();
         add_filter('map_meta_cap', [$this, 'map_meta_cap'], 10, 4);
     }
     

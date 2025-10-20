@@ -27,8 +27,8 @@ class NewsSection {
      * Initialize the taxonomy
      */
     public function __construct() {
-        add_action('init', [$this, 'register_taxonomy'], 10);
-        add_action('init', [$this, 'register_term_meta'], 10);
+        $this->register_taxonomy();
+        $this->register_term_meta();
     }
     
     /**
