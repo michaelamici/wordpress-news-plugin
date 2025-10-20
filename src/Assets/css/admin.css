@@ -1,0 +1,175 @@
+/**
+ * News Plugin Admin Styles
+ * Minimal structural CSS - can be overridden by theme
+ */
+
+.news-dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.news-stat-box {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    padding: 1rem;
+    text-align: center;
+}
+
+.news-stat-box h3 {
+    font-size: 2rem;
+    margin: 0 0 0.5rem 0;
+    color: #1d2327;
+}
+
+.news-stat-box p {
+    margin: 0;
+    color: #646970;
+}
+
+.news-dashboard-actions {
+    margin: 1rem 0;
+}
+
+.news-dashboard-actions .button {
+    margin-right: 0.5rem;
+}
+
+/* Front Configuration */
+.news-front-config {
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    padding: 1rem;
+    margin: 1rem 0;
+}
+
+.news-front-regions {
+    display: grid;
+    gap: 1rem;
+}
+
+.news-front-region {
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 1rem;
+}
+
+.news-front-region h3 {
+    margin: 0 0 1rem 0;
+    color: #1d2327;
+}
+
+.news-front-items {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.news-front-item {
+    padding: 0.5rem;
+    background: #f9f9f9;
+    border-radius: 3px;
+}
+
+.news-front-item h4 {
+    margin: 0 0 0.5rem 0;
+}
+
+.news-front-item a {
+    text-decoration: none;
+    color: #1d2327;
+}
+
+.news-front-item a:hover {
+    color: #2271b1;
+}
+
+.news-front-placements {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e0e0e0;
+}
+
+.news-placement {
+    display: inline-block;
+    margin: 0.25rem;
+    padding: 0.5rem 1rem;
+    background: #f0f0f0;
+    border-radius: 3px;
+    font-size: 0.9rem;
+}
+
+.news-placement-region {
+    color: #646970;
+    margin-left: 0.5rem;
+}
+
+/* Placement Block */
+.news-placement {
+    border: 2px dashed #c3c4c7;
+    border-radius: 4px;
+    padding: 1rem;
+    text-align: center;
+    margin: 1rem 0;
+}
+
+.news-placement-content {
+    color: #646970;
+}
+
+.news-placement-error {
+    background: #fcf0f1;
+    border: 1px solid #d63638;
+    color: #d63638;
+    padding: 0.5rem;
+    border-radius: 3px;
+    margin: 0.5rem 0;
+}
+
+/* Editor Panels */
+.news-editor-panel {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    padding: 1rem;
+    margin: 1rem 0;
+}
+
+.news-editor-panel h3 {
+    margin: 0 0 1rem 0;
+    color: #1d2327;
+}
+
+.news-meta-field {
+    margin-bottom: 1rem;
+}
+
+.news-meta-field label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+}
+
+.news-meta-field input,
+.news-meta-field textarea,
+.news-meta-field select {
+    width: 100%;
+    max-width: 400px;
+}
+
+.news-meta-field input[type="checkbox"] {
+    width: auto;
+    margin-right: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .news-dashboard-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .news-front-regions {
+        grid-template-columns: 1fr;
+    }
+}
