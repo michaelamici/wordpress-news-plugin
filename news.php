@@ -27,6 +27,9 @@ define('NEWS_PLUGIN_URL', plugin_dir_url(__FILE__));
 require_once NEWS_PLUGIN_DIR . 'src/Includes/Autoloader.php';
 \NewsPlugin\Includes\Autoloader::register();
 
+// Disable WordPress big image feature
+add_filter('big_image_size_threshold', '__return_false');
+
 // Load text domain and initialize components
 add_action('init', function() {
     // Load text domain first
