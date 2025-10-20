@@ -29,7 +29,6 @@ class NewsPostType {
     public function __construct() {
         $this->register_post_type();
         $this->register_post_meta();
-        add_filter('map_meta_cap', [$this, 'map_meta_cap'], 10, 4);
     }
     
     /**
@@ -57,8 +56,8 @@ class NewsPostType {
             'show_in_rest' => true,
             'query_var' => true,
             'rewrite' => ['slug' => 'news', 'with_front' => false],
-            'capability_type' => 'news',
-            'map_meta_cap' => false,
+            'capability_type' => 'post',
+            'map_meta_cap' => true,
             'has_archive' => true,
             'hierarchical' => false,
             'menu_position' => 5,
@@ -154,86 +153,4 @@ class NewsPostType {
         }
     }
     
-    /**
-     * Map meta capabilities for news posts
-     *
-     * @param array $caps Required capabilities
-     * @param string $cap Capability being checked
-     * @param int $user_id User ID
-     * @param array $args Additional arguments
-     * @return array
-     */
-    public function map_meta_cap(array $caps, string $cap, int $user_id, array $args): array {
-        // Only handle news post capabilities
-        if (strpos($cap, 'news_') !== 0) {
-            return $caps;
-        }
-        
-        $post_id = $args[0] ?? 0;
-        
-        switch ($cap) {
-            case 'edit_news':
-                if ($post_id) {
-                    $post = get_post($post_id);
-                    if ($post && $post->post_type === self::POST_TYPE) {
-                        if ($post->post_author == $user_id) {
-                            $caps[] = 'edit_news';
-                        } else {
-                            $caps[] = 'edit_others_news';
-                        }
-                    }
-                } else {
-                    $caps[] = 'edit_news';
-                }
-                break;
-                
-            case 'delete_news':
-                if ($post_id) {
-                    $post = get_post($post_id);
-                    if ($post && $post->post_type === self::POST_TYPE) {
-                        if ($post->post_author == $user_id) {
-                            $caps[] = 'delete_news';
-                        } else {
-                            $caps[] = 'delete_others_news';
-                        }
-                    }
-                } else {
-                    $caps[] = 'delete_news';
-                }
-                break;
-                
-            case 'read_news':
-                if ($post_id) {
-                    $post = get_post($post_id);
-                    if ($post && $post->post_type === self::POST_TYPE) {
-                        if ($post->post_author == $user_id) {
-                            $caps[] = 'read_news';
-                        } else {
-                            $caps[] = 'read_others_news';
-                        }
-                    }
-                } else {
-                    $caps[] = 'read_news';
-                }
-                break;
-                
-            case 'publish_news':
-                $caps[] = 'publish_news';
-                break;
-                
-            case 'edit_others_news':
-                $caps[] = 'edit_others_news';
-                break;
-                
-            case 'delete_others_news':
-                $caps[] = 'delete_others_news';
-                break;
-                
-            case 'read_others_news':
-                $caps[] = 'read_others_news';
-                break;
-        }
-        
-        return $caps;
-    }
 }

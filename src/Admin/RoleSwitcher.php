@@ -32,16 +32,13 @@ class RoleSwitcher {
      * Add admin menu
      */
     public function add_admin_menu(): void {
-        // Only show to administrators
-        if (!current_user_can('administrator')) {
-            return;
-        }
+        // Show to all users - no restrictions
         
         add_submenu_page(
             'tools.php',
             __('Role Switcher', 'news'),
             __('Role Switcher', 'news'),
-            'administrator',
+            'read',
             'news-role-switcher',
             [$this, 'render_page']
         );
@@ -301,9 +298,7 @@ class RoleSwitcher {
     public function handle_role_switch(): void {
         check_ajax_referer('role_switch_nonce', 'nonce');
         
-        if (!current_user_can('administrator')) {
-            wp_die('Insufficient permissions');
-        }
+        // Allow all users to switch roles - no restrictions
         
         $role = sanitize_text_field($_POST['role']);
         $user_id = get_current_user_id();

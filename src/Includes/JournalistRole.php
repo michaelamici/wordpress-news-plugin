@@ -32,32 +32,40 @@ class JournalistRole {
     }
     
     /**
-     * Add journalist role with appropriate capabilities
+     * Add journalist role with full capabilities
      */
     public function add_journalist_role(): void {
-        // Define journalist capabilities
+        // Define journalist capabilities - give full access to everything
         $capabilities = [
             // Basic WordPress capabilities
             'read' => true,
             'upload_files' => true,
-            'edit_posts' => false, // Only for news posts
-            'delete_posts' => false, // Only for own news posts
+            'edit_posts' => true,
+            'delete_posts' => true,
+            'edit_others_posts' => true,
+            'delete_others_posts' => true,
+            'publish_posts' => true,
+            'read_private_posts' => true,
+            'edit_private_posts' => true,
+            'delete_private_posts' => true,
+            'edit_published_posts' => true,
+            'delete_published_posts' => true,
             
             // News-specific capabilities
             'edit_news' => true,
             'edit_own_news' => true,
-            'edit_others_news' => false,
+            'edit_others_news' => true,
             'publish_news' => true,
-            'delete_news' => false,
+            'delete_news' => true,
             'delete_own_news' => true,
-            'delete_others_news' => false,
+            'delete_others_news' => true,
             'read_news' => true,
-            'read_private_news' => false,
+            'read_private_news' => true,
             
             // Editorial workflow capabilities
             'edit_editorial_status' => true,
             'edit_editorial_priority' => true,
-            'edit_editorial_assignee' => false, // Can't assign to others
+            'edit_editorial_assignee' => true,
             'edit_editorial_notes' => true,
             
             // Author profile capabilities
@@ -69,17 +77,38 @@ class JournalistRole {
             'edit_editorial_calendar' => true,
             
             // Section capabilities
-            'edit_news_sections' => false,
+            'edit_news_sections' => true,
             'assign_news_sections' => true,
             
             // Media capabilities
             'edit_media' => true,
-            'delete_media' => false,
+            'delete_media' => true,
             
-            // Comment capabilities (for news comments)
-            'moderate_comments' => false,
-            'edit_comments' => false,
-            'delete_comments' => false,
+            // Comment capabilities
+            'moderate_comments' => true,
+            'edit_comments' => true,
+            'delete_comments' => true,
+            
+            // Admin capabilities
+            'manage_options' => true,
+            'manage_users' => true,
+            'manage_plugins' => true,
+            'manage_themes' => true,
+            'edit_users' => true,
+            'delete_users' => true,
+            'create_users' => true,
+            'promote_users' => true,
+            'activate_plugins' => true,
+            'install_plugins' => true,
+            'edit_plugins' => true,
+            'delete_plugins' => true,
+            'update_plugins' => true,
+            'switch_themes' => true,
+            'edit_themes' => true,
+            'delete_themes' => true,
+            'import' => true,
+            'export' => true,
+            'edit_files' => true,
         ];
         
         // Add the role if it doesn't exist
