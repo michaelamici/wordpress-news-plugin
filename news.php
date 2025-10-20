@@ -27,28 +27,34 @@ define('NEWS_PLUGIN_URL', plugin_dir_url(__FILE__));
 require_once NEWS_PLUGIN_DIR . 'src/Includes/Autoloader.php';
 \NewsPlugin\Includes\Autoloader::register();
 
-// Initialize core components
-new \NewsPlugin\PostTypes\NewsPostType();
-new \NewsPlugin\PostTypes\NewsSection();
-new \NewsPlugin\Includes\Options();
-new \NewsPlugin\Includes\PlacementsRegistry();
-new \NewsPlugin\Includes\RestApi();
-new \NewsPlugin\Includes\CacheManager();
-
-// Initialize blocks and admin
-new \NewsPlugin\Blocks\FrontConfigBlock();
-new \NewsPlugin\Blocks\PlacementBlock();
-new \NewsPlugin\Admin\NewsArticlePanels();
-new \NewsPlugin\Admin\AdminMenu();
-
-// Initialize security and performance
-new \NewsPlugin\Includes\SecurityManager();
-new \NewsPlugin\Includes\PerformanceOptimizer();
-
-// Initialize advanced features
-new \NewsPlugin\Widgets\BreakingNewsTicker();
-new \NewsPlugin\Includes\AdvancedPlacements();
-new \NewsPlugin\Includes\AnalyticsManager();
+// Load text domain and initialize components
+add_action('init', function() {
+    // Load text domain first
+    load_plugin_textdomain('news', false, dirname(plugin_basename(__FILE__)) . '/languages');
+    
+    // Initialize core components
+    new \NewsPlugin\PostTypes\NewsPostType();
+    new \NewsPlugin\PostTypes\NewsSection();
+    new \NewsPlugin\Includes\Options();
+    new \NewsPlugin\Includes\PlacementsRegistry();
+    new \NewsPlugin\Includes\RestApi();
+    new \NewsPlugin\Includes\CacheManager();
+    
+    // Initialize blocks and admin
+    new \NewsPlugin\Blocks\FrontConfigBlock();
+    new \NewsPlugin\Blocks\PlacementBlock();
+    new \NewsPlugin\Admin\NewsArticlePanels();
+    new \NewsPlugin\Admin\AdminMenu();
+    
+    // Initialize security and performance
+    new \NewsPlugin\Includes\SecurityManager();
+    new \NewsPlugin\Includes\PerformanceOptimizer();
+    
+    // Initialize advanced features
+    new \NewsPlugin\Widgets\BreakingNewsTicker();
+    new \NewsPlugin\Includes\AdvancedPlacements();
+    new \NewsPlugin\Includes\AnalyticsManager();
+});
 
 // Activation/Deactivation hooks
 register_activation_hook(__FILE__, 'news_plugin_activate');
