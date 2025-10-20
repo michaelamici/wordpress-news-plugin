@@ -51,6 +51,44 @@ For support and feedback, contact the development team.
 
 ---
 
+## v0.2.0 - Editorial Workflow 🚀
+**Release Date**: December 1st, 2024  
+**Tag**: `v0.2.0`
+
+### 🎉 What's New
+This release introduces comprehensive editorial workflow features for The New Baltimore Gazette News Plugin, enabling efficient content management and collaboration.
+
+### ✨ New Features
+- **Editorial Calendar**: Interactive calendar view for managing content deadlines and assignments
+- **Author Management**: Extended author profiles with specialties, social links, and contact information
+- **Content Workflow**: Approval workflow with status transitions and assignment system
+- **Workflow History**: Complete audit trail of content changes and approvals
+- **REST API**: Full API endpoints for editorial calendar and author management
+- **Admin Interface**: Dedicated editorial calendar page with filtering and navigation
+
+### 🔧 Technical Features
+- **Workflow Statuses**: Draft, Assigned, In Progress, Review, Approved, Published, Rejected
+- **Priority Levels**: Low, Normal, High, Urgent with visual indicators
+- **Assignment System**: Assign content to specific editors and reviewers
+- **Notification System**: Email notifications for workflow status changes
+- **Responsive Design**: Mobile-friendly calendar and workflow interface
+
+### 📋 Breaking Changes
+- None - this is a feature addition release
+
+### 🎯 What's Next
+- **v0.3.0**: Performance and scale improvements (January 2025)
+- **v0.4.0**: Advanced fronts and personalization (March 2025)
+- **v0.5.0**: Analytics and insights (April 2025)
+
+### 🐛 Known Issues
+- None at this time
+
+### 📞 Support
+For support and feedback, contact the development team.
+
+---
+
 ## Release Template
 
 ### vX.Y.Z - [Release Name] 🚀
