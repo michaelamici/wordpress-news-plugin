@@ -201,6 +201,11 @@ class AdminMenu {
             'hide_empty' => false,
         ]);
         
+        // Handle WP_Error from wp_count_terms
+        if (is_wp_error($total_sections)) {
+            $total_sections = 0;
+        }
+        
         $breaking_articles = get_posts([
             'post_type' => 'news',
             'meta_query' => [
@@ -213,6 +218,11 @@ class AdminMenu {
             'fields' => 'ids',
             'posts_per_page' => -1,
         ]);
+        
+        // Handle WP_Error from get_posts
+        if (is_wp_error($breaking_articles)) {
+            $breaking_articles = [];
+        }
         
         return [
             'total_articles' => $total_articles_count,
