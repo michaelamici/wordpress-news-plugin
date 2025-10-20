@@ -63,6 +63,12 @@ add_action('init', function() {
     new \NewsPlugin\Editorial\EditorialCalendar();
     new \NewsPlugin\Editorial\AuthorManager();
     new \NewsPlugin\Editorial\ContentWorkflow();
+    
+    // Initialize journalist role management
+    new \NewsPlugin\Includes\JournalistRole();
+    
+    // Initialize role switcher for testing
+    new \NewsPlugin\Admin\RoleSwitcher();
 });
 
 // Activation/Deactivation hooks
