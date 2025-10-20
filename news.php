@@ -45,6 +45,11 @@ new \NewsPlugin\Admin\AdminMenu();
 new \NewsPlugin\Includes\SecurityManager();
 new \NewsPlugin\Includes\PerformanceOptimizer();
 
+// Initialize advanced features
+new \NewsPlugin\Widgets\BreakingNewsTicker();
+new \NewsPlugin\Includes\AdvancedPlacements();
+new \NewsPlugin\Includes\AnalyticsManager();
+
 // Activation/Deactivation hooks
 register_activation_hook(__FILE__, 'news_plugin_activate');
 register_deactivation_hook(__FILE__, 'news_plugin_deactivate');
