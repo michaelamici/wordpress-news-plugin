@@ -2,7 +2,7 @@
     "name": "new-baltimore-gazette/news-plugin",
     "description": "WordPress plugin for The New Baltimore Gazette news management",
     "type": "wordpress-plugin",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "license": "proprietary",
     "authors": [
         {
