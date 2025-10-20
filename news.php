@@ -2,7 +2,7 @@
 /**
  * Plugin Name: New Baltimore Gazette News
  * Description: News plugin for the New Baltimore Gazette - sections, fronts, articles, and placements.
- * Version: 0.0.1
+ * Version: 0.1.0
  * Author: New Baltimore Gazette
  * License: Proprietary
  * Text Domain: news
@@ -18,7 +18,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('NEWS_PLUGIN_VERSION', '0.0.1');
+define('NEWS_PLUGIN_VERSION', '0.1.0');
 define('NEWS_PLUGIN_FILE', __FILE__);
 define('NEWS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('NEWS_PLUGIN_URL', plugin_dir_url(__FILE__));

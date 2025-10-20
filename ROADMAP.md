@@ -1,67 +1,191 @@
-# Roadmap to Nov 1 (Beta)
+# News Plugin Development Roadmap
 
-## Milestones (Step-based)
-- Step 1 — Foundation: Data model scaffolding (CPT `news`, taxonomy `news_section`), options for fronts, BreakingAlert storage, placements registry spec.
-- Step 2 — Fronts MVP: HomeFront + SectionFront with hero/rails SSR, caching, and REST (`/news/v1/front/<slug>`, `/news/v1/breaking`).
-- Step 3 — Editor Surfaces: Gutenberg panels/blocks for front config and placements; minimal structural CSS; theme override hooks verified.
-- Step 4 — Hardening: Validation, capabilities, nonces; performance passes; JSON-LD; optional content migration script.
+## Goal: November 1st Beta Launch → Production Excellence 🚀
 
-## Constraints
-- Gutenberg-only, block themes, WP 6.5+, PHP 8.1+.
-- Hook/Filter-first rendering; templates only when unavoidable.
-- Structural CSS only; theme can override/replace via filters.
+The New Baltimore Gazette News Plugin - A comprehensive WordPress solution for modern newspaper management.
 
-## Risks & Mitigations
-- Scope creep: lock MVP (no custom workflows); defer advanced modules.
-- Theme integration: provide stable hooks and `locate_template(...)` fallbacks early.
-- Performance: transients per region; invalidate on content/term changes; preload thumbnails/meta.
+## 🏷️ Version-Based Development Strategy
 
-## Success Criteria
-- Editors can publish Articles and assign Sections.
-- Home/Section fronts render with hero+rails; ad slots render via hooks.
-- No PHP fatals; REST and editor panels work; page TTFB acceptable.
+### v0.1.0 - BETA LAUNCH (CURRENT) ✅
+**Tag: `v0.1.0`** - *November 1st, 2024*
 
-## Exit Gates
-- Step 1: CPT/taxonomy register, basic meta registered with REST exposure, options saved/loaded, placements registry callable. ✅
-- Step 2: Fronts JSON endpoint returns regions with items, SSR templates render via hooks, caching keys configured. ✅
-- Step 3: Editor panels load without console errors; block attributes persist; theme overrides demonstrated. ✅
-- Step 4: Security checks pass (nonces/caps), Lighthouse basic performance acceptable, smoke tests green. ✅
+**🎉 Core Foundation Delivered:**
+- ✅ News post type with full meta fields (dek, byline, location, flags)
+- ✅ Hierarchical news sections taxonomy with term meta
+- ✅ Fronts system (HomeFront, SectionFront) with configurable regions
+- ✅ REST API endpoints for all content types
+- ✅ Gutenberg blocks for front configuration and placements
+- ✅ Admin dashboard with news statistics and management
+- ✅ Security hardening with capability management
+- ✅ Performance optimization with caching
+- ✅ Breaking news ticker widget
+- ✅ Advanced placement targeting
+- ✅ Analytics integration
+- ✅ Comprehensive testing framework (unit, integration, smoke tests)
 
-## COMPLETED - Nov 1 Beta Ready! 🎉
+**🚀 Ready for Beta Launch!**
 
-### What's Been Delivered
-- ✅ **Data Model**: CPT `news`, taxonomy `news_section`, meta fields with REST exposure
-- ✅ **Fronts System**: HomeFront + SectionFront with hero/rails regions, caching, SSR templates
-- ✅ **REST API**: `/news/v1/front/<slug>`, `/news/v1/breaking`, `/news/v1/fronts`
-- ✅ **Gutenberg Blocks**: Front configuration and placement blocks with Inspector controls
-- ✅ **Editor Experience**: News article panels, meta fields, section assignment
-- ✅ **Admin Interface**: Dashboard, fronts management, breaking alerts, placements
-- ✅ **Security**: Capability mapping, nonces, validation, sanitization
-- ✅ **Performance**: Caching, query optimization, asset optimization
-- ✅ **Sample Content**: 5 news articles across 4 sections showcasing all features
+---
 
-### Next Steps (Post-Beta)
-- **Step 5**: Advanced Features
-  - Breaking news ticker widget
-  - Advanced placement targeting (device, time, user)
-  - Analytics integration
-  - Content scheduling and embargo system
-  - Multi-author bylines and contributor management
+### v0.2.0 - EDITORIAL WORKFLOW (NEXT)
+**Target: December 1st, 2024**
 
-- **Step 6**: Performance & Scale
-  - Redis/Memcached integration
-  - CDN optimization for assets
-  - Database query optimization
-  - Load testing and performance monitoring
+**📝 Editorial Features:**
+- Multi-author bylines with role management
+- Editorial calendar with scheduling
+- Content approval workflow
+- Author profiles and management
+- Publishing schedules and embargo system
+- Content versioning and revision tracking
+- Editorial notifications and alerts
 
-- **Step 7**: Editorial Workflow
-  - Content approval workflow
-  - Editorial calendar integration
-  - Social media auto-posting
-  - SEO optimization tools
+**🎯 Success Metrics:**
+- Editorial team can manage content lifecycle
+- Multi-author collaboration working
+- Publishing workflow automated
 
-- **Step 8**: Advanced Fronts
-  - Drag-and-drop front builder
-  - A/B testing for front layouts
-  - Personalization based on user behavior
-  - Mobile-specific front configurations
+---
+
+### v0.3.0 - PERFORMANCE & SCALE
+**Target: January 15th, 2025**
+
+**⚡ Performance Features:**
+- Database optimization and indexing
+- CDN integration for assets
+- Advanced caching strategies (Redis/Memcached)
+- Query optimization and lazy loading
+- Load testing and performance monitoring
+- Image optimization and WebP support
+- Critical CSS generation
+
+**🎯 Success Metrics:**
+- Page load times < 2 seconds
+- Support for 10,000+ articles
+- 99.9% uptime
+
+---
+
+### v0.4.0 - ADVANCED FRONTS
+**Target: March 1st, 2025**
+
+**🏠 Front Features:**
+- Dynamic front layouts with drag-and-drop
+- A/B testing for front designs
+- Personalization based on user behavior
+- Mobile-specific front configurations
+- AMP integration for mobile performance
+- Front templates and themes
+- Real-time front updates
+
+**🎯 Success Metrics:**
+- Multiple front layouts working
+- A/B testing showing results
+- Mobile performance optimized
+
+---
+
+### v0.5.0 - ANALYTICS & INSIGHTS
+**Target: April 15th, 2025**
+
+**📊 Analytics Features:**
+- Advanced analytics dashboard
+- Content performance metrics
+- Reader engagement tracking
+- Placement performance analytics
+- Revenue tracking for ads
+- SEO optimization tools
+- Social media integration
+
+**🎯 Success Metrics:**
+- Comprehensive analytics working
+- Data-driven content decisions
+- Revenue tracking functional
+
+---
+
+### v1.0.0 - PRODUCTION EXCELLENCE
+**Target: June 1st, 2025**
+
+**🌟 Production Features:**
+- Full documentation and user guides
+- Advanced security audit and hardening
+- Multi-site support
+- API rate limiting and throttling
+- Backup and disaster recovery
+- Monitoring and alerting
+- Professional support system
+
+**🎯 Success Metrics:**
+- Production-ready for enterprise
+- Full documentation available
+- Support system operational
+
+---
+
+## 🚀 Getting This Thing Off the Ground!
+
+### Immediate Actions (Next 30 Days):
+1. **Beta Testing**: Deploy v0.1.0 to staging environment
+2. **User Feedback**: Gather feedback from editorial team
+3. **Performance Monitoring**: Set up monitoring and alerts
+4. **Documentation**: Create user guides and API docs
+5. **Marketing**: Prepare for public beta announcement
+
+### Success Metrics for Each Version:
+- **v0.1.0**: Core functionality working, no critical bugs
+- **v0.2.0**: Editorial workflow smooth, team adoption
+- **v0.3.0**: Performance targets met, scale proven
+- **v0.4.0**: Advanced features adopted, user satisfaction high
+- **v0.5.0**: Analytics driving decisions, revenue growth
+- **v1.0.0**: Production excellence, enterprise ready
+
+### Development Principles:
+- **Ship Early, Ship Often**: Regular releases every 6-8 weeks
+- **User-Driven**: Features based on real user needs
+- **Performance First**: Never compromise on speed
+- **Security Always**: Security is not an afterthought
+- **Test Everything**: Comprehensive testing at every level
+- **Document Everything**: Clear docs for users and developers
+
+**🎯 Goal: From Beta to Production Excellence in 6 months!**
+
+---
+
+## 📋 Version History
+
+### v0.1.0 - Beta Launch (Current)
+- **Release Date**: November 1st, 2024
+- **Status**: ✅ COMPLETED
+- **Key Features**: Core data model, fronts system, REST API, Gutenberg blocks, admin interface, security, performance, testing
+- **Next**: Editorial workflow features
+
+### Future Versions
+- **v0.2.0**: Editorial Workflow (December 2024)
+- **v0.3.0**: Performance & Scale (January 2025)
+- **v0.4.0**: Advanced Fronts (March 2025)
+- **v0.5.0**: Analytics & Insights (April 2025)
+- **v1.0.0**: Production Excellence (June 2025)
+
+---
+
+## 🎯 Success Criteria
+
+### Beta Launch (v0.1.0) ✅
+- [x] Core functionality working without critical bugs
+- [x] All REST API endpoints responding correctly
+- [x] Gutenberg blocks functional
+- [x] Admin interface complete
+- [x] Security hardening implemented
+- [x] Performance optimization in place
+- [x] Comprehensive testing framework
+
+### Production Ready (v1.0.0)
+- [ ] Enterprise-grade security audit
+- [ ] Full documentation suite
+- [ ] Multi-site support
+- [ ] Professional support system
+- [ ] Performance benchmarks met
+- [ ] User satisfaction > 90%
+- [ ] Revenue targets achieved
+
+**🚀 Let's get this thing off the ground!**
