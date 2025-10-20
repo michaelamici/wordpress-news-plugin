@@ -48,6 +48,7 @@ add_action('init', function() {
     new \NewsPlugin\Blocks\PlacementBlock();
     new \NewsPlugin\Admin\NewsArticlePanels();
     new \NewsPlugin\Admin\AdminMenu();
+    new \NewsPlugin\Admin\EditorialCalendarPage();
     
     // Initialize security and performance
     new \NewsPlugin\Includes\SecurityManager();
@@ -57,6 +58,11 @@ add_action('init', function() {
     new \NewsPlugin\Widgets\BreakingNewsTicker();
     new \NewsPlugin\Includes\AdvancedPlacements();
     new \NewsPlugin\Includes\AnalyticsManager();
+    
+    // Initialize editorial workflow features (v0.2.0)
+    new \NewsPlugin\Editorial\EditorialCalendar();
+    new \NewsPlugin\Editorial\AuthorManager();
+    new \NewsPlugin\Editorial\ContentWorkflow();
 });
 
 // Activation/Deactivation hooks
