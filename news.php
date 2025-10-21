@@ -74,8 +74,10 @@ function news_plugin(): Plugin {
     return Plugin::instance();
 }
 
-// Initialize the plugin
-news_plugin();
+// Initialize the plugin after WordPress is loaded
+add_action('plugins_loaded', function() {
+    news_plugin()->init();
+});
 
 // Activation/Deactivation hooks
 register_activation_hook(__FILE__, 'news_plugin_activate');

@@ -1,0 +1,53 @@
+{
+    "name": "news-plugin",
+    "version": "1.0.0",
+    "description": "WordPress News Plugin with modern development tools",
+    "main": "index.js",
+    "scripts": {
+        "build": "wp-scripts build",
+        "start": "wp-scripts start",
+        "lint:css": "wp-scripts lint-style",
+        "lint:js": "wp-scripts lint-js",
+        "lint:pkg-json": "wp-scripts lint-pkg-json",
+        "format": "wp-scripts format",
+        "test": "wp-scripts test-unit-js",
+        "test:e2e": "playwright test",
+        "test:e2e:ui": "playwright test --ui",
+        "zip": "wp-scripts plugin-zip",
+        "dev": "npm run start",
+        "prod": "npm run build"
+    },
+    "keywords": [
+        "wordpress",
+        "plugin",
+        "news",
+        "gutenberg",
+        "blocks"
+    ],
+    "author": "New Baltimore Gazette",
+    "license": "GPL-3.0-or-later",
+    "devDependencies": {
+        "@playwright/test": "^1.40.0",
+        "@wordpress/scripts": "^27.0.0",
+        "@wordpress/eslint-plugin": "^17.0.0",
+        "@wordpress/prettier-config": "^3.0.0",
+        "eslint": "^8.57.0",
+        "prettier": "^3.1.0"
+    },
+    "dependencies": {
+        "@wordpress/api-fetch": "^6.0.0",
+        "@wordpress/blocks": "^12.0.0",
+        "@wordpress/components": "^25.0.0",
+        "@wordpress/data": "^9.0.0",
+        "@wordpress/element": "^5.0.0",
+        "@wordpress/hooks": "^3.0.0",
+        "@wordpress/i18n": "^4.0.0"
+    },
+    "browserslist": [
+        "extends @wordpress/browserslist-config"
+    ]
+}
+
+
+
+
