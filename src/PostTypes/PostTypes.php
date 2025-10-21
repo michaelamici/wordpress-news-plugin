@@ -47,9 +47,15 @@ class PostTypes
         // Add custom capabilities
         add_action('init', [$this, 'addCapabilities']);
         
+        // Add user capability filter to handle capability checks
+        add_filter('user_has_cap', [$this, 'filterUserCapabilities'], 10, 4);
+        
         // Add rewrite rules
         add_action('init', [$this, 'addRewriteRules']);
         add_filter('post_type_link', [$this, 'customPostTypeLink'], 10, 2);
+        
+        // Set default byline for new news articles
+        add_action('wp_insert_post', [$this, 'setDefaultByline'], 10, 3);
     }
 
     /**
@@ -122,7 +128,7 @@ class PostTypes
                 'edit_private_posts' => 'edit_private_news',
                 'edit_published_posts' => 'edit_published_news',
             ],
-            'map_meta_cap' => true,
+            'map_meta_cap' => false,
             'has_archive' => true,
             'hierarchical' => false,
             'menu_position' => 5,
@@ -320,6 +326,15 @@ class PostTypes
             'show_in_rest' => true,
             'sanitize_callback' => 'absint',
         ]);
+
+        // Register byline meta field
+        register_post_meta('news', '_news_byline', [
+            'type' => 'string',
+            'description' => 'Article byline',
+            'single' => true,
+            'show_in_rest' => true,
+            'sanitize_callback' => 'sanitize_text_field',
+        ]);
     }
 
     /**
@@ -437,5 +452,71 @@ class PostTypes
     public function getRegisteredTaxonomies(): array
     {
         return ['news_section', 'news_beat'];
+    }
+
+
+    /**
+     * Filter user capabilities to handle news post capabilities
+     */
+    public function filterUserCapabilities(array $allcaps, array $caps, array $args, \WP_User $user): array
+    {
+        // Only handle if we're checking for edit_post capability
+        if (empty($args) || !in_array('edit_post', $args)) {
+            return $allcaps;
+        }
+
+        // Get the post ID from args
+        $post_id = isset($args[2]) ? (int) $args[2] : 0;
+        
+        // If no post ID, check if user has edit_news capability
+        if (!$post_id) {
+            if (isset($allcaps['edit_news'])) {
+                $allcaps['edit_post'] = true;
+            }
+            return $allcaps;
+        }
+
+        // Get the post
+        $post = get_post($post_id);
+        
+        if (!$post || $post->post_type !== 'news') {
+            return $allcaps;
+        }
+
+        // Map news capabilities to post capabilities
+        if (isset($allcaps['edit_news'])) {
+            $allcaps['edit_post'] = true;
+        }
+        if (isset($allcaps['read_news'])) {
+            $allcaps['read_post'] = true;
+        }
+        if (isset($allcaps['delete_news'])) {
+            $allcaps['delete_post'] = true;
+        }
+
+        return $allcaps;
+    }
+
+    /**
+     * Set default byline for new news articles
+     */
+    public function setDefaultByline(int $post_id, $post, bool $update): void
+    {
+        // Only for news posts that are being created (not updated)
+        if ($post->post_type !== 'news' || $update) {
+            return;
+        }
+
+        // Check if byline already exists
+        $existing_byline = get_post_meta($post_id, '_news_byline', true);
+        
+        if (empty($existing_byline)) {
+            // Get the author
+            $author = get_userdata($post->post_author);
+            $author_name = $author ? $author->display_name : 'Staff Writer';
+            
+            // Set default byline
+            update_post_meta($post_id, '_news_byline', $author_name);
+        }
     }
 }

@@ -54,8 +54,12 @@ class SecurityManager
     /**
      * Check if current user has capability
      */
-    public function currentUserCan(string $capability): bool
+    public function currentUserCan(string $capability, ?int $post_id = null): bool
     {
+        if ($post_id && in_array($capability, ['edit_post', 'read_post', 'delete_post'])) {
+            return current_user_can($capability, $post_id);
+        }
+        
         return current_user_can($capability);
     }
 
@@ -65,6 +69,30 @@ class SecurityManager
     public function canManageNews(): bool
     {
         return $this->currentUserCan('manage_news');
+    }
+
+    /**
+     * Check if current user can edit a specific news post
+     */
+    public function canEditNewsPost(int $post_id): bool
+    {
+        return $this->currentUserCan('edit_news', $post_id);
+    }
+
+    /**
+     * Check if current user can read a specific news post
+     */
+    public function canReadNewsPost(int $post_id): bool
+    {
+        return $this->currentUserCan('read_news', $post_id);
+    }
+
+    /**
+     * Check if current user can delete a specific news post
+     */
+    public function canDeleteNewsPost(int $post_id): bool
+    {
+        return $this->currentUserCan('delete_news', $post_id);
     }
 
     /**
@@ -142,7 +170,7 @@ class SecurityManager
     /**
      * Sanitize array input
      */
-    public function sanitizeArray(array $array, callable $sanitizer = null): array
+    public function sanitizeArray(array $array, ?callable $sanitizer = null): array
     {
         if ($sanitizer) {
             return array_map($sanitizer, $array);

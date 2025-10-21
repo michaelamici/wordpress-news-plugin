@@ -1,0 +1,30 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "news/post-template",
+    "version": "1.0.0",
+    "title": "News Post Template",
+    "category": "news",
+    "icon": "layout",
+    "description": "A template block for news posts that includes byline and other news-specific elements.",
+    "keywords": ["template", "news", "post", "byline"],
+    "textdomain": "news",
+    "editorScript": "file:./index.js",
+    "supports": {
+        "html": false,
+        "color": {
+            "text": true,
+            "background": true
+        },
+        "typography": {
+            "fontSize": true,
+            "lineHeight": true
+        },
+        "spacing": {
+            "padding": true,
+            "margin": true
+        }
+    },
+    "usesContext": ["postId", "postType"],
+    "render": "file:./render.php"
+}

@@ -76,6 +76,7 @@ function news_plugin(): Plugin {
 
 // Initialize the plugin after WordPress is loaded
 add_action('plugins_loaded', function() {
+    error_log('News Plugin: Plugin loaded and initializing...');
     news_plugin()->init();
 });
 

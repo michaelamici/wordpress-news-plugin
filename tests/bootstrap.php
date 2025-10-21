@@ -17,7 +17,7 @@ if (!defined('NEWS_PLUGIN_DIR')) {
 }
 
 if (!defined('NEWS_PLUGIN_URL')) {
-    define('NEWS_PLUGIN_URL', 'http://example.com/');
+    define('NEWS_PLUGIN_URL', 'https://wordpress.local/');
 }
 
 if (!defined('NEWS_PLUGIN_BASENAME')) {

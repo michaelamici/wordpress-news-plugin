@@ -71,7 +71,7 @@ class CacheManager
     /**
      * Set cached data
      */
-    public function set(string $key, mixed $data, int $duration = null): bool
+    public function set(string $key, mixed $data, ?int $duration = null): bool
     {
         $cache_key = $this->getCacheKey($key);
         $duration = $duration ?? $this->duration;
@@ -100,7 +100,7 @@ class CacheManager
     /**
      * Get or set cached data
      */
-    public function remember(string $key, callable $callback, int $duration = null): mixed
+    public function remember(string $key, callable $callback, ?int $duration = null): mixed
     {
         if ($this->has($key)) {
             return $this->get($key);
@@ -229,7 +229,7 @@ class CacheManager
     /**
      * Cache a database query result
      */
-    public function cacheQuery(string $key, callable $query, int $duration = null): mixed
+    public function cacheQuery(string $key, callable $query, ?int $duration = null): mixed
     {
         return $this->remember($key, $query, $duration);
     }
@@ -237,7 +237,7 @@ class CacheManager
     /**
      * Cache a WordPress query
      */
-    public function cacheWpQuery(array $args, int $duration = null): mixed
+    public function cacheWpQuery(array $args, ?int $duration = null): mixed
     {
         $key = 'wp_query_' . md5(serialize($args));
         
@@ -249,7 +249,7 @@ class CacheManager
     /**
      * Cache a function result
      */
-    public function cacheFunction(string $key, callable $function, array $args = [], int $duration = null): mixed
+    public function cacheFunction(string $key, callable $function, array $args = [], ?int $duration = null): mixed
     {
         $cache_key = $key . '_' . md5(serialize($args));
         

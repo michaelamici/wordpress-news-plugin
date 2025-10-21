@@ -213,6 +213,9 @@ final class Plugin
         if (!isset($this->blockManager)) {
             $this->blockManager = new BlockManager();
         }
+        
+        // Initialize the block manager
+        $this->blockManager->init();
     }
 
     /**

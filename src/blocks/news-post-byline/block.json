@@ -1,0 +1,26 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "news/post-byline",
+    "version": "1.0.0",
+    "title": "Post Byline",
+    "category": "news",
+    "icon": "admin-users",
+    "description": "Display the byline for a news article within a Query Loop.",
+    "keywords": ["byline", "author", "news"],
+    "textdomain": "news",
+    "editorScript": "file:./index.js",
+    "supports": {
+        "html": false,
+        "color": {
+            "text": true,
+            "background": false
+        },
+        "typography": {
+            "fontSize": true
+        }
+    },
+    "usesContext": ["postId", "postType"],
+    "ancestor": ["core/post-template", "core/query"],
+    "render": "file:./render.php"
+}
