@@ -1,13 +1,13 @@
 {
     "$schema": "https://schemas.wp.org/trunk/block.json",
     "apiVersion": 3,
-    "name": "news/post-template",
+    "name": "news/post-live",
     "version": "1.0.0",
-    "title": "News Post Template",
+    "title": "Post Live",
     "category": "news",
-    "icon": "layout",
-    "description": "A template block for news posts that includes byline and other news-specific elements.",
-    "keywords": ["template", "news", "post", "byline"],
+    "icon": "video-alt3",
+    "description": "Display live content badge within a Query Loop.",
+    "keywords": ["live", "badge", "news"],
     "textdomain": "news",
     "editorScript": "file:./index.js",
     "supports": {
@@ -17,14 +17,10 @@
             "background": true
         },
         "typography": {
-            "fontSize": true,
-            "lineHeight": true
-        },
-        "spacing": {
-            "padding": true,
-            "margin": true
+            "fontSize": true
         }
     },
     "usesContext": ["postId", "postType"],
+    "ancestor": ["core/post-template", "core/query"],
     "render": "file:./render.php"
 }

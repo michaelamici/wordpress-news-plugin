@@ -55,7 +55,8 @@ class Admin
         
         // Add meta boxes
         add_action('add_meta_boxes', [$this, 'addMetaBoxes']);
-        add_action('save_post', [$this, 'saveMetaBoxes']);
+        
+        // REST API support is handled by meta field registration in PostTypes.php
         
         // Add admin AJAX handlers
         add_action('wp_ajax_news_admin_action', [$this, 'handleAjaxAction']);
@@ -299,38 +300,11 @@ class Admin
      */
     public function renderArticleMetaBox($post): void
     {
-        $meta = get_post_meta($post->ID, '_news_article_meta', true);
-        
+        // The template now handles getting individual meta fields directly
         include NEWS_PLUGIN_DIR . 'src/Templates/admin/meta-boxes/article-meta.php';
     }
 
-    /**
-     * Save meta boxes
-     */
-    public function saveMetaBoxes(int $post_id): void
-    {
-        if (!$this->security->canEditNews()) {
-            return;
-        }
 
-        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
-            return;
-        }
-
-        if (!isset($_POST['news_article_meta_nonce']) || 
-            !$this->security->verifyNonce($_POST['news_article_meta_nonce'], 'article_meta')) {
-            return;
-        }
-
-        $meta_data = [
-            'featured' => $this->security->sanitizeBool($_POST['featured'] ?? false),
-            'breaking' => $this->security->sanitizeBool($_POST['breaking'] ?? false),
-            'exclusive' => $this->security->sanitizeBool($_POST['exclusive'] ?? false),
-            'sponsored' => $this->security->sanitizeBool($_POST['sponsored'] ?? false),
-        ];
-
-        update_post_meta($post_id, '_news_article_meta', $meta_data);
-    }
 
     /**
      * Enqueue admin assets
@@ -396,8 +370,8 @@ class Admin
         
         switch ($action_type) {
             case 'clear_cache':
-                $this->plugin->getCacheManager()->flush();
-                wp_send_json_success(['message' => __('Cache cleared successfully', 'news')]);
+                // Cache functionality removed
+                wp_send_json_success(['message' => __('Cache functionality has been removed', 'news')]);
                 break;
             default:
                 wp_send_json_error(['message' => __('Invalid action type', 'news')]);
@@ -412,7 +386,7 @@ class Admin
         return [
             'total_articles' => wp_count_posts('news')->publish,
             'total_sections' => wp_count_terms('news_section'),
-            'cache_stats' => $this->plugin->getCacheManager()->getStats(),
+            'cache_stats' => ['status' => 'disabled'],
             'database_stats' => $this->plugin->getDatabaseManager()->getStats(),
         ];
     }

@@ -1,0 +1,26 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "news/post-featured",
+    "version": "1.0.0",
+    "title": "Post Featured",
+    "category": "news",
+    "icon": "star-filled",
+    "description": "Display featured article badge within a Query Loop.",
+    "keywords": ["featured", "badge", "news"],
+    "textdomain": "news",
+    "editorScript": "file:./index.js",
+    "supports": {
+        "html": false,
+        "color": {
+            "text": true,
+            "background": true
+        },
+        "typography": {
+            "fontSize": true
+        }
+    },
+    "usesContext": ["postId", "postType"],
+    "ancestor": ["core/post-template", "core/query"],
+    "render": "file:./render.php"
+}

@@ -272,35 +272,50 @@ class PostTypes
      */
     public function registerMetaFields(): void
     {
-        // Register article meta fields
-        register_post_meta('news', '_news_article_meta', [
-            'type' => 'object',
-            'description' => 'News article metadata',
-            'single' => true,
-            'show_in_rest' => [
-                'schema' => [
-                    'type' => 'object',
-                    'properties' => [
-                        'featured' => [
-                            'type' => 'boolean',
-                            'default' => false,
-                        ],
-                        'breaking' => [
-                            'type' => 'boolean',
-                            'default' => false,
-                        ],
-                        'exclusive' => [
-                            'type' => 'boolean',
-                            'default' => false,
-                        ],
-                        'sponsored' => [
-                            'type' => 'boolean',
-                            'default' => false,
-                        ],
-                    ],
-                ],
-            ],
-        ]);
+
+                // Register article meta fields
+                register_post_meta('news', '_news_featured', [
+                    'type' => 'boolean',
+                    'description' => 'Is the article featured?',
+                    'single' => true,
+                    'show_in_rest' => true,
+                ]);
+
+                register_post_meta('news', '_news_breaking', [
+                    'type' => 'boolean',
+                    'description' => 'Is the article a breaking news article?',
+                    'single' => true,
+                    'show_in_rest' => true,
+                ]);
+
+                register_post_meta('news', '_news_exclusive', [
+                    'type' => 'boolean',
+                    'description' => 'Is the article an exclusive article?',
+                    'single' => true,
+                    'show_in_rest' => true,
+                ]);
+
+                register_post_meta('news', '_news_sponsored', [
+                    'type' => 'boolean',
+                    'description' => 'Is the article a sponsored article?',
+                    'single' => true,
+                    'show_in_rest' => true,
+                ]);
+
+                register_post_meta('news', '_news_is_live', [
+                    'type' => 'boolean',
+                    'description' => 'Is the article live?',
+                    'single' => true,
+                    'show_in_rest' => true,
+                ]);
+
+                register_post_meta('news', '_news_last_updated', [
+                    'type' => 'string',
+                    'description' => 'Last updated date',
+                    'single' => true,
+                    'show_in_rest' => true,
+                ]);
+                
 
         // Register section meta fields
         register_term_meta('news_section', 'section_color', [

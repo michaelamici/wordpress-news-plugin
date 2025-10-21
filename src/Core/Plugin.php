@@ -10,7 +10,6 @@ use NewsPlugin\Blocks\BlockManager;
 use NewsPlugin\Widgets\WidgetManager;
 use NewsPlugin\Api\RestApi;
 use NewsPlugin\Security\SecurityManager;
-use NewsPlugin\Cache\CacheManager;
 use NewsPlugin\Database\DatabaseManager;
 use NewsPlugin\Assets\AssetManager;
 use NewsPlugin\Hooks\HookManager;
@@ -68,7 +67,6 @@ final class Plugin
     private WidgetManager $widgetManager;
     private RestApi $restApi;
     private SecurityManager $securityManager;
-    private CacheManager $cacheManager;
     private DatabaseManager $databaseManager;
     private AssetManager $assetManager;
     private HookManager $hookManager;
@@ -143,7 +141,6 @@ final class Plugin
     {
         $this->hookManager = new HookManager();
         $this->securityManager = new SecurityManager();
-        $this->cacheManager = new CacheManager();
         $this->databaseManager = new DatabaseManager();
         $this->assetManager = new AssetManager();
         $this->postTypes = new PostTypes();
@@ -171,6 +168,9 @@ final class Plugin
 
         // Plugin row meta
         add_filter('plugin_row_meta', [$this, 'addRowMeta'], 10, 2);
+        
+        // Add save hook for news posts (needs to be available outside admin for Gutenberg)
+        add_action('save_post', [$this, 'saveNewsMeta'], 10, 1);
     }
 
     /**
@@ -363,6 +363,71 @@ final class Plugin
     }
 
     /**
+     * Save news meta fields
+     */
+    public function saveNewsMeta(int $post_id): void
+    {
+        // Only handle news posts
+        if (get_post_type($post_id) !== 'news') {
+            return;
+        }
+
+        // Check if user has permission
+        if (!current_user_can('edit_post', $post_id)) {
+            return;
+        }
+
+        // Skip autosave
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+            return;
+        }
+
+        // Check nonce for traditional editor
+        if (isset($_POST['news_article_meta_nonce']) && 
+            !wp_verify_nonce($_POST['news_article_meta_nonce'], 'news_article_meta')) {
+            return;
+        }
+
+        // Save meta fields
+        $meta_fields = [
+            'news_featured' => '_news_featured',
+            'news_breaking' => '_news_breaking',
+            'news_exclusive' => '_news_exclusive',
+            'news_sponsored' => '_news_sponsored',
+            'news_is_live' => '_news_is_live',
+            'news_byline' => '_news_byline',
+            'news_last_updated' => '_news_last_updated'
+        ];
+
+        foreach ($meta_fields as $form_field => $meta_key) {
+            if (isset($_POST[$form_field])) {
+                $value = $_POST[$form_field];
+                
+                // Handle checkbox fields
+                if (in_array($form_field, ['news_featured', 'news_breaking', 'news_exclusive', 'news_sponsored', 'news_is_live'])) {
+                    $value = ($value === '1') ? true : false;
+                } else {
+                    $value = sanitize_text_field($value);
+                }
+                
+                update_post_meta($post_id, $meta_key, $value);
+            } else {
+                // For checkboxes, if not present in POST, set to false
+                if (in_array($form_field, ['news_featured', 'news_breaking', 'news_exclusive', 'news_sponsored', 'news_is_live'])) {
+                    update_post_meta($post_id, $meta_key, false);
+                }
+            }
+        }
+        
+        // Handle last updated date special case
+        if (isset($_POST['news_last_updated']) && !empty($_POST['news_last_updated'])) {
+            update_post_meta($post_id, '_news_last_updated_manual', true);
+        } else {
+            delete_post_meta($post_id, '_news_last_updated_manual');
+        }
+    }
+
+    /**
      * Get component managers
      */
     public function getAdmin(): ?Admin
@@ -395,10 +460,6 @@ final class Plugin
         return $this->securityManager;
     }
 
-    public function getCacheManager(): CacheManager
-    {
-        return $this->cacheManager;
-    }
 
     public function getDatabaseManager(): DatabaseManager
     {

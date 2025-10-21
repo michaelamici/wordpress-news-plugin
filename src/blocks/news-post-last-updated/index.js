@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 import metadata from './block.json';
 
 /**
- * Edit component for the news/post-byline block
+ * Edit component for the news/post-last-updated block
  */
 function Edit({ context }) {
     const blockProps = useBlockProps();
@@ -15,8 +15,8 @@ function Edit({ context }) {
     const postId = context?.postId;
     const postType = context?.postType;
     
-    // Get the actual byline from post meta using the correct approach
-    const byline = useSelect((select) => {
+    // Get the last updated date from post meta
+    const lastUpdated = useSelect((select) => {
         if (!postId || !postType) {
             return '';
         }
@@ -30,24 +30,25 @@ function Edit({ context }) {
             
             // Get the meta field
             const meta = select('core').getEditedEntityRecord('postType', postType, postId)?.meta;
-            return meta?._news_byline || '';
+            return meta?._news_last_updated || '';
         } catch (error) {
-            console.warn('Byline block: Error fetching data:', error);
+            console.warn('Last updated block: Error fetching data:', error);
             return '';
         }
     }, [postId, postType]);
     
     return (
         <div {...blockProps}>
-            <div className="news-post-byline-editor">
-                <strong>{__('Byline:', 'news')}</strong> 
-                {byline ? (
-                    <span className="news-post-byline-content">{byline}</span>
+            <div className="news-post-last-updated-editor">
+                {lastUpdated ? (
+                    <span className="news-post-last-updated-content">
+                        {__('Updated: ', 'news') + lastUpdated}
+                    </span>
                 ) : (
-                    <span className="news-post-byline-empty">
+                    <span className="news-post-last-updated-empty">
                         {postId ? 
-                            __('[No byline set for post ID: ', 'news') + postId + ']' :
-                            __('[Article byline will appear here]', 'news')
+                            __('[No update date for post ID: ', 'news') + postId + ']' :
+                            __('[Last updated date will appear here]', 'news')
                         }
                     </span>
                 )}

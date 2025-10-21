@@ -57,7 +57,12 @@ class BlockManager
     public function registerBlocks(): void
     {
         $this->registerNewsPostBylineBlock();
-        $this->registerNewsPostTemplateBlock();
+        $this->registerNewsPostFeaturedBlock();
+        $this->registerNewsPostBreakingBlock();
+        $this->registerNewsPostExclusiveBlock();
+        $this->registerNewsPostSponsoredBlock();
+        $this->registerNewsPostLiveBlock();
+        $this->registerNewsPostLastUpdatedBlock();
     }
 
     /**
@@ -76,14 +81,89 @@ class BlockManager
     }
 
     /**
-     * Register news post template block
+     * Register news post featured block
      */
-    private function registerNewsPostTemplateBlock(): void
+    private function registerNewsPostFeaturedBlock(): void
     {
-        $block_json_path = plugin_dir_path(__FILE__) . '../../build/blocks/news-post-template/block.json';
+        $block_json_path = plugin_dir_path(__FILE__) . '../../build/blocks/news-post-featured/block.json';
         
         if (!file_exists($block_json_path)) {
-            error_log('News Plugin: Post Template Block JSON file not found at: ' . $block_json_path);
+            error_log('News Plugin: Featured Block JSON file not found at: ' . $block_json_path);
+            return;
+        }
+        
+        register_block_type($block_json_path);
+    }
+
+    /**
+     * Register news post breaking block
+     */
+    private function registerNewsPostBreakingBlock(): void
+    {
+        $block_json_path = plugin_dir_path(__FILE__) . '../../build/blocks/news-post-breaking/block.json';
+        
+        if (!file_exists($block_json_path)) {
+            error_log('News Plugin: Breaking Block JSON file not found at: ' . $block_json_path);
+            return;
+        }
+        
+        register_block_type($block_json_path);
+    }
+
+    /**
+     * Register news post exclusive block
+     */
+    private function registerNewsPostExclusiveBlock(): void
+    {
+        $block_json_path = plugin_dir_path(__FILE__) . '../../build/blocks/news-post-exclusive/block.json';
+        
+        if (!file_exists($block_json_path)) {
+            error_log('News Plugin: Exclusive Block JSON file not found at: ' . $block_json_path);
+            return;
+        }
+        
+        register_block_type($block_json_path);
+    }
+
+    /**
+     * Register news post sponsored block
+     */
+    private function registerNewsPostSponsoredBlock(): void
+    {
+        $block_json_path = plugin_dir_path(__FILE__) . '../../build/blocks/news-post-sponsored/block.json';
+        
+        if (!file_exists($block_json_path)) {
+            error_log('News Plugin: Sponsored Block JSON file not found at: ' . $block_json_path);
+            return;
+        }
+        
+        register_block_type($block_json_path);
+    }
+
+    /**
+     * Register news post live block
+     */
+    private function registerNewsPostLiveBlock(): void
+    {
+        $block_json_path = plugin_dir_path(__FILE__) . '../../build/blocks/news-post-live/block.json';
+        
+        if (!file_exists($block_json_path)) {
+            error_log('News Plugin: Live Block JSON file not found at: ' . $block_json_path);
+            return;
+        }
+        
+        register_block_type($block_json_path);
+    }
+
+    /**
+     * Register news post last updated block
+     */
+    private function registerNewsPostLastUpdatedBlock(): void
+    {
+        $block_json_path = plugin_dir_path(__FILE__) . '../../build/blocks/news-post-last-updated/block.json';
+        
+        if (!file_exists($block_json_path)) {
+            error_log('News Plugin: Last Updated Block JSON file not found at: ' . $block_json_path);
             return;
         }
         

@@ -1,0 +1,26 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "news/post-exclusive",
+    "version": "1.0.0",
+    "title": "Post Exclusive",
+    "category": "news",
+    "icon": "lock",
+    "description": "Display exclusive content badge within a Query Loop.",
+    "keywords": ["exclusive", "badge", "news"],
+    "textdomain": "news",
+    "editorScript": "file:./index.js",
+    "supports": {
+        "html": false,
+        "color": {
+            "text": true,
+            "background": true
+        },
+        "typography": {
+            "fontSize": true
+        }
+    },
+    "usesContext": ["postId", "postType"],
+    "ancestor": ["core/post-template", "core/query"],
+    "render": "file:./render.php"
+}

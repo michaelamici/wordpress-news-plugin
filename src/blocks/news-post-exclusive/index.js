@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 import metadata from './block.json';
 
 /**
- * Edit component for the news/post-byline block
+ * Edit component for the news/post-exclusive block
  */
 function Edit({ context }) {
     const blockProps = useBlockProps();
@@ -15,39 +15,40 @@ function Edit({ context }) {
     const postId = context?.postId;
     const postType = context?.postType;
     
-    // Get the actual byline from post meta using the correct approach
-    const byline = useSelect((select) => {
+    // Get the exclusive flag from post meta
+    const isExclusive = useSelect((select) => {
         if (!postId || !postType) {
-            return '';
+            return false;
         }
         
         try {
             // Get the post record using the correct post type from context
             const post = select('core').getEntityRecord('postType', postType, postId);
             if (!post) {
-                return '';
+                return false;
             }
             
             // Get the meta field
             const meta = select('core').getEditedEntityRecord('postType', postType, postId)?.meta;
-            return meta?._news_byline || '';
+            return meta?._news_exclusive || false;
         } catch (error) {
-            console.warn('Byline block: Error fetching data:', error);
-            return '';
+            console.warn('Exclusive block: Error fetching data:', error);
+            return false;
         }
     }, [postId, postType]);
     
     return (
         <div {...blockProps}>
-            <div className="news-post-byline-editor">
-                <strong>{__('Byline:', 'news')}</strong> 
-                {byline ? (
-                    <span className="news-post-byline-content">{byline}</span>
+            <div className="news-post-exclusive-editor">
+                {isExclusive ? (
+                    <span className="news-post-exclusive-badge">
+                        {__('Exclusive', 'news')}
+                    </span>
                 ) : (
-                    <span className="news-post-byline-empty">
+                    <span className="news-post-exclusive-empty">
                         {postId ? 
-                            __('[No byline set for post ID: ', 'news') + postId + ']' :
-                            __('[Article byline will appear here]', 'news')
+                            __('[Not exclusive - post ID: ', 'news') + postId + ']' :
+                            __('[Exclusive badge will appear here]', 'news')
                         }
                     </span>
                 )}
