@@ -1,14 +1,20 @@
 <?php
 /**
  * Plugin Name: New Baltimore Gazette News
- * Description: News plugin for the New Baltimore Gazette - sections, fronts, articles, and placements.
- * Version: 0.2.0
+ * Plugin URI: https://newbaltimoregazette.com
+ * Description: Comprehensive news management plugin for WordPress with modern development practices, Gutenberg blocks, widgets, and REST API.
+ * Version: 1.0.0
  * Author: New Baltimore Gazette
- * License: Proprietary
+ * Author URI: https://newbaltimoregazette.com
+ * License: GPL-3.0-or-later
+ * License URI: https://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain: news
+ * Domain Path: /languages
  * Requires at least: 6.5
  * Tested up to: 6.6
  * Requires PHP: 8.1
+ * Network: false
+ * Update URI: false
  */
 
 declare(strict_types=1);
@@ -18,58 +24,58 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('NEWS_PLUGIN_VERSION', '0.2.0');
+define('NEWS_PLUGIN_VERSION', '1.0.0');
 define('NEWS_PLUGIN_FILE', __FILE__);
 define('NEWS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('NEWS_PLUGIN_URL', plugin_dir_url(__FILE__));
+define('NEWS_PLUGIN_BASENAME', plugin_basename(__FILE__));
+define('NEWS_PLUGIN_SLUG', 'news');
+
+// Check minimum requirements
+if (version_compare(PHP_VERSION, '8.1', '<')) {
+    add_action('admin_notices', function() {
+        echo '<div class="notice notice-error"><p>';
+        printf(
+            esc_html__('News Plugin requires PHP 8.1 or higher. You are running PHP %s.', 'news'),
+            PHP_VERSION
+        );
+        echo '</p></div>';
+    });
+    return;
+}
+
+if (version_compare(get_bloginfo('version'), '6.5', '<')) {
+    add_action('admin_notices', function() {
+        echo '<div class="notice notice-error"><p>';
+        printf(
+            esc_html__('News Plugin requires WordPress 6.5 or higher. You are running WordPress %s.', 'news'),
+            get_bloginfo('version')
+        );
+        echo '</p></div>';
+    });
+    return;
+}
 
 // Autoloader
-require_once NEWS_PLUGIN_DIR . 'src/Includes/Autoloader.php';
-\NewsPlugin\Includes\Autoloader::register();
+if (file_exists(NEWS_PLUGIN_DIR . 'vendor/autoload.php')) {
+    require_once NEWS_PLUGIN_DIR . 'vendor/autoload.php';
+} else {
+    // Fallback autoloader for development
+    require_once NEWS_PLUGIN_DIR . 'src/NewsPlugin.php';
+}
 
-// Disable WordPress big image feature
-add_filter('big_image_size_threshold', '__return_false');
+// Initialize the plugin
+use NewsPlugin\Core\Plugin;
 
-// Load text domain and initialize components
-add_action('init', function() {
-    // Load text domain first
-    load_plugin_textdomain('news', false, dirname(plugin_basename(__FILE__)) . '/languages');
-    
-    // Initialize core components
-    new \NewsPlugin\PostTypes\NewsPostType();
-    new \NewsPlugin\PostTypes\NewsSection();
-    new \NewsPlugin\Includes\Options();
-    new \NewsPlugin\Includes\PlacementsRegistry();
-    new \NewsPlugin\Includes\RestApi();
-    new \NewsPlugin\Includes\CacheManager();
-    
-    // Initialize blocks and admin
-    new \NewsPlugin\Blocks\FrontConfigBlock();
-    new \NewsPlugin\Blocks\PlacementBlock();
-    new \NewsPlugin\Admin\NewsArticlePanels();
-    new \NewsPlugin\Admin\AdminMenu();
-    new \NewsPlugin\Admin\EditorialCalendarPage();
-    
-    // Initialize security and performance
-    new \NewsPlugin\Includes\SecurityManager();
-    new \NewsPlugin\Includes\PerformanceOptimizer();
-    
-    // Initialize advanced features
-    new \NewsPlugin\Widgets\BreakingNewsTicker();
-    new \NewsPlugin\Includes\AdvancedPlacements();
-    new \NewsPlugin\Includes\AnalyticsManager();
-    
-    // Initialize editorial workflow features (v0.2.0)
-    new \NewsPlugin\Editorial\EditorialCalendar();
-    new \NewsPlugin\Editorial\AuthorManager();
-    new \NewsPlugin\Editorial\ContentWorkflow();
-    
-    // Initialize journalist role management
-    new \NewsPlugin\Includes\JournalistRole();
-    
-    // Initialize role switcher for testing
-    new \NewsPlugin\Admin\RoleSwitcher();
-});
+/**
+ * Get the main plugin instance
+ */
+function news_plugin(): Plugin {
+    return Plugin::instance();
+}
+
+// Initialize the plugin
+news_plugin();
 
 // Activation/Deactivation hooks
 register_activation_hook(__FILE__, 'news_plugin_activate');
@@ -79,12 +85,21 @@ register_deactivation_hook(__FILE__, 'news_plugin_deactivate');
  * Plugin activation
  */
 function news_plugin_activate(): void {
+    // Check requirements
+    if (version_compare(PHP_VERSION, '8.1', '<') || version_compare(get_bloginfo('version'), '6.5', '<')) {
+        deactivate_plugins(plugin_basename(__FILE__));
+        wp_die(esc_html__('News Plugin requires PHP 8.1+ and WordPress 6.5+', 'news'));
+    }
+    
     // Flush rewrite rules
     flush_rewrite_rules();
     
     // Set default options
-    $options = new \NewsPlugin\Includes\Options();
-    $options->register_options();
+    add_option('news_plugin_version', NEWS_PLUGIN_VERSION);
+    add_option('news_plugin_activated', time());
+    
+    // Create database tables if needed
+    do_action('news_plugin_activate');
 }
 
 /**
@@ -93,4 +108,7 @@ function news_plugin_activate(): void {
 function news_plugin_deactivate(): void {
     // Flush rewrite rules
     flush_rewrite_rules();
+    
+    // Clear caches
+    do_action('news_plugin_deactivate');
 }
