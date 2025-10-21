@@ -6,7 +6,7 @@
 
 use NewsPlugin\Core\Plugin;
 
-class TestSimple extends PHPUnit\Framework\TestCase
+class TestPlugin extends PHPUnit\Framework\TestCase
 {
     private Plugin $plugin;
     
