@@ -63,6 +63,7 @@ class BlockManager
         $this->registerNewsPostSponsoredBlock();
         $this->registerNewsPostLiveBlock();
         $this->registerNewsPostLastUpdatedBlock();
+        $this->registerNewsArticleLayoutBlock();
     }
 
     /**
@@ -209,6 +210,23 @@ class BlockManager
     {
         return ['news-post-byline'];
     }
+
+    /**
+     * Register news article layout block
+     */
+    private function registerNewsArticleLayoutBlock(): void
+    {
+        $block_json_path = plugin_dir_path(__FILE__) . '../../build/blocks/news-article-layout/block.json';
+        
+        if (!file_exists($block_json_path)) {
+            error_log('News Plugin: Article Layout Block JSON file not found at: ' . $block_json_path);
+            return;
+        }
+        
+        // Register as dynamic block (no render callback needed)
+        register_block_type($block_json_path);
+    }
+
 
     /**
      * Get block by name

@@ -1,0 +1,43 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "news/article-layout",
+  "version": "1.0.0",
+  "title": "News Article Layout",
+  "category": "news",
+  "icon": "layout",
+  "description": "Display news articles in a hero-grid-list layout with featured article as hero.",
+  "keywords": ["news", "articles", "layout", "hero", "grid", "list"],
+  "textdomain": "news",
+  "editorScript": "file:./index.js",
+  "style": "file:./style.css",
+  "supports": {
+    "align": ["wide", "full"],
+    "spacing": {
+      "padding": true,
+      "margin": true
+    },
+    "color": {
+      "background": true,
+      "text": true
+    }
+  },
+  "attributes": {
+    "gridCount": {
+      "type": "number",
+      "default": 3
+    },
+    "sectionFilter": {
+      "type": "string",
+      "default": ""
+    },
+    "showExcerpt": {
+      "type": "boolean",
+      "default": true
+    },
+    "showDate": {
+      "type": "boolean",
+      "default": true
+    }
+  }
+}

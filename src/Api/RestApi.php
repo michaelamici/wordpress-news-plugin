@@ -49,7 +49,11 @@ class RestApi
     private function init(): void
     {
         add_action('rest_api_init', [$this, 'registerRoutes']);
+        // Also register routes immediately for testing
+        $this->registerRoutes();
     }
+
+
 
     /**
      * Register REST API routes
@@ -175,6 +179,34 @@ class RestApi
                 ],
             ],
         ]);
+
+        // News articles endpoint for layout block
+        register_rest_route(self::NAMESPACE, '/layout', [
+            'methods' => 'GET',
+            'callback' => [$this, 'getArticlesLayout'],
+            'permission_callback' => '__return_true',
+            'args' => [
+                'grid_count' => [
+                    'type' => 'integer',
+                    'default' => 3,
+                    'minimum' => 1,
+                    'maximum' => 6,
+                ],
+                'section_filter' => [
+                    'type' => 'string',
+                    'default' => '',
+                ],
+                'show_excerpt' => [
+                    'type' => 'boolean',
+                    'default' => true,
+                ],
+                'show_date' => [
+                    'type' => 'boolean',
+                    'default' => true,
+                ],
+            ],
+        ]);
+
     }
 
     /**
@@ -244,6 +276,119 @@ class RestApi
             'page' => $page,
             'per_page' => $per_page,
         ]);
+    }
+
+    /**
+     * Get articles for the layout block
+     */
+    public function getArticlesLayout(WP_REST_Request $request): WP_REST_Response
+    {
+        $grid_count = $request->get_param('grid_count');
+        $section_filter = $request->get_param('section_filter');
+        $show_excerpt = $request->get_param('show_excerpt');
+        $show_date = $request->get_param('show_date');
+
+        // Build query args
+        $query_args = [
+            'post_type' => 'news',
+            'post_status' => 'publish',
+            'posts_per_page' => -1,
+            'orderby' => 'modified',
+            'order' => 'DESC',
+            'meta_query' => []
+        ];
+
+        // Add section filter if specified
+        if (!empty($section_filter)) {
+            $query_args['tax_query'] = [
+                [
+                    'taxonomy' => 'news_section',
+                    'field' => 'slug',
+                    'terms' => $section_filter
+                ]
+            ];
+        }
+
+        // Query all articles
+        $articles_query = new \WP_Query($query_args);
+        $all_posts = $articles_query->posts ?? [];
+
+        if (empty($all_posts)) {
+            // Try fallback to regular posts
+            $fallback_query = new \WP_Query([
+                'post_type' => 'post',
+                'post_status' => 'publish',
+                'posts_per_page' => 10,
+                'orderby' => 'modified',
+                'order' => 'DESC'
+            ]);
+            
+            if (!empty($fallback_query->posts)) {
+                $all_posts = $fallback_query->posts;
+            }
+        }
+
+        // Separate featured and regular articles
+        $featured_posts = [];
+        $regular_posts = [];
+
+        foreach ($all_posts as $post) {
+            $is_featured = get_post_meta($post->ID, '_news_featured', true);
+            if ($is_featured) {
+                $featured_posts[] = $post;
+            } else {
+                $regular_posts[] = $post;
+            }
+        }
+
+        // Sort featured posts by modified date (most recent first)
+        usort($featured_posts, function($a, $b) {
+            return strtotime($b->post_modified) - strtotime($a->post_modified);
+        });
+
+        // Sort regular posts by modified date
+        usort($regular_posts, function($a, $b) {
+            return strtotime($b->post_modified) - strtotime($a->post_modified);
+        });
+
+        // Get hero article (most recent featured)
+        $hero_post = !empty($featured_posts) ? $featured_posts[0] : null;
+
+        // Get grid articles (next articles up to grid_count)
+        $grid_posts = array_slice($regular_posts, 0, $grid_count);
+
+        // Get list articles (remaining)
+        $list_posts = array_slice($regular_posts, $grid_count);
+
+        // If no hero, use first regular post as hero
+        if (!$hero_post && !empty($regular_posts)) {
+            $hero_post = $regular_posts[0];
+            $grid_posts = array_slice($regular_posts, 1, $grid_count);
+            $list_posts = array_slice($regular_posts, $grid_count + 1);
+        }
+
+        // Format posts for JSON response
+        $format_post = function($post) use ($show_excerpt, $show_date) {
+            return [
+                'id' => $post->ID,
+                'title' => get_the_title($post->ID),
+                'excerpt' => $show_excerpt ? get_the_excerpt($post->ID) : '',
+                'date' => $show_date ? get_the_date('', $post->ID) : '',
+                'url' => get_permalink($post->ID),
+                'image' => get_the_post_thumbnail_url($post->ID, 'large'),
+                'image_medium' => get_the_post_thumbnail_url($post->ID, 'medium'),
+                'featured' => get_post_meta($post->ID, '_news_featured', true),
+            ];
+        };
+
+        $response_data = [
+            'hero' => $hero_post ? $format_post($hero_post) : null,
+            'grid' => array_map($format_post, $grid_posts),
+            'list' => array_map($format_post, $list_posts),
+            'total' => count($all_posts),
+        ];
+
+        return new WP_REST_Response($response_data, 200);
     }
 
     /**

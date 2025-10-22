@@ -233,7 +233,9 @@ final class Plugin
      */
     public function initRestApi(): void
     {
+        error_log('News Plugin: initRestApi called');
         if (!isset($this->restApi)) {
+            error_log('News Plugin: Creating new RestApi instance');
             $this->restApi = new RestApi();
         }
     }
