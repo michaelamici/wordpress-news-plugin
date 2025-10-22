@@ -1,214 +1,235 @@
-import { registerBlockType } from '@wordpress/blocks';
-import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
-import { PanelBody, RangeControl, SelectControl, ToggleControl, Spinner } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
-import { useState, useEffect } from '@wordpress/element';
-import apiFetch from '@wordpress/api-fetch';
+import { registerBlockVariation } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
-import metadata from './block.json';
+// Hero Grid List variation for News Articles
+const HERO_GRID_LIST_VARIATION_NAME = 'news/article-layout-hero-grid-list';
 
-// Article Layout Component
-function ArticleLayout({ articles, showExcerpt, showDate }) {
-    if (!articles || articles.total === 0) {
+registerBlockVariation('core/query', {
+    name: HERO_GRID_LIST_VARIATION_NAME,
+    title: __('News Article Layout - Hero Grid List', 'news'),
+    description: __('Display news articles in a hero-grid-list layout with featured article as hero', 'news'),
+    isActive: ({ namespace, query }) => {
         return (
-            <div className="news-article-layout-empty">
-                <p>{__('No articles found.', 'news')}</p>
-            </div>
-        );
-    }
-
-    const { hero, grid, list } = articles;
-
-    return (
-        <div className="news-article-layout">
-            {/* Hero Section */}
-            {hero && (
-                <div className="news-hero">
-                    <article className="news-hero-article">
-                        {hero.image && (
-                            <div className="news-hero-image">
-                                <a href={hero.url}>
-                                    <img src={hero.image} alt={hero.title} />
-                                </a>
-                            </div>
-                        )}
-                        <div className="news-hero-content">
-                            <h2 className="news-hero-title">
-                                <a href={hero.url}>{hero.title}</a>
-                            </h2>
-                            {showExcerpt && hero.excerpt && (
-                                <div className="news-hero-excerpt">{hero.excerpt}</div>
-                            )}
-                            {showDate && hero.date && (
-                                <div className="news-hero-date">{hero.date}</div>
-                            )}
-                        </div>
-                    </article>
-                </div>
-            )}
-
-            {/* Grid Section */}
-            {grid && grid.length > 0 && (
-                <div className="news-grid">
-                    {grid.map((post) => (
-                        <article key={post.id} className="news-grid-item">
-                            {post.image_medium && (
-                                <div className="news-grid-image">
-                                    <a href={post.url}>
-                                        <img src={post.image_medium} alt={post.title} />
-                                    </a>
-                                </div>
-                            )}
-                            <div className="news-grid-content">
-                                <h3 className="news-grid-title">
-                                    <a href={post.url}>{post.title}</a>
-                                </h3>
-                                {showExcerpt && post.excerpt && (
-                                    <div className="news-grid-excerpt">{post.excerpt}</div>
-                                )}
-                                {showDate && post.date && (
-                                    <div className="news-grid-date">{post.date}</div>
-                                )}
-                            </div>
-                        </article>
-                    ))}
-                </div>
-            )}
-
-            {/* List Section */}
-            {list && list.length > 0 && (
-                <div className="news-list">
-                    {list.map((post) => (
-                        <article key={post.id} className="news-list-item">
-                            <h4 className="news-list-title">
-                                <a href={post.url}>{post.title}</a>
-                            </h4>
-                            {showExcerpt && post.excerpt && (
-                                <div className="news-list-excerpt">{post.excerpt}</div>
-                            )}
-                            {showDate && post.date && (
-                                <div className="news-list-date">{post.date}</div>
-                            )}
-                        </article>
-                    ))}
-                </div>
-            )}
-        </div>
-    );
-}
-
-registerBlockType(metadata, {
-    edit: function Edit({ attributes, setAttributes }) {
-        const blockProps = useBlockProps();
-        const { gridCount, sectionFilter, showExcerpt, showDate } = attributes;
-        const [articles, setArticles] = useState(null);
-        const [loading, setLoading] = useState(true);
-        const [error, setError] = useState(null);
-
-        // Get available sections for filter
-        const sections = useSelect((select) => {
-            const { getEntityRecords } = select('core');
-            return getEntityRecords('taxonomy', 'news_section', {
-                per_page: -1,
-                orderby: 'name',
-                order: 'asc'
-            });
-        }, []);
-
-        const sectionOptions = [
-            { label: __('All Sections', 'news'), value: '' },
-            ...(sections || []).map(section => ({
-                label: section.name,
-                value: section.slug
-            }))
-        ];
-
-        // Fetch articles when attributes change
-        useEffect(() => {
-            const fetchArticles = async () => {
-                setLoading(true);
-                setError(null);
-                
-                try {
-                    const response = await apiFetch({
-                        path: `/index.php?rest_route=/news/v1/layout&grid_count=${gridCount}&section_filter=${sectionFilter}&show_excerpt=${showExcerpt}&show_date=${showDate}`,
-                    });
-                    setArticles(response);
-                } catch (err) {
-                    console.error('News Plugin: API error:', err);
-                    setError(err.message || __('Failed to load articles', 'news'));
-                } finally {
-                    setLoading(false);
-                }
-            };
-
-            fetchArticles();
-        }, [gridCount, sectionFilter, showExcerpt, showDate]);
-
-        return (
-            <>
-                <InspectorControls>
-                    <PanelBody title={__('Layout Settings', 'news')}>
-                        <RangeControl
-                            label={__('Grid Items Count', 'news')}
-                            value={gridCount}
-                            onChange={(value) => setAttributes({ gridCount: value })}
-                            min={1}
-                            max={6}
-                        />
-                    </PanelBody>
-                    
-                    <PanelBody title={__('Filter Settings', 'news')}>
-                        <SelectControl
-                            label={__('Section Filter', 'news')}
-                            value={sectionFilter}
-                            options={sectionOptions}
-                            onChange={(value) => setAttributes({ sectionFilter: value })}
-                        />
-                    </PanelBody>
-                    
-                    <PanelBody title={__('Display Settings', 'news')}>
-                        <ToggleControl
-                            label={__('Show Excerpt', 'news')}
-                            checked={showExcerpt}
-                            onChange={(value) => setAttributes({ showExcerpt: value })}
-                        />
-                        <ToggleControl
-                            label={__('Show Date', 'news')}
-                            checked={showDate}
-                            onChange={(value) => setAttributes({ showDate: value })}
-                        />
-                    </PanelBody>
-                </InspectorControls>
-
-                <div {...blockProps}>
-                    {loading && (
-                        <div className="news-article-layout-loading">
-                            <Spinner />
-                            <p>{__('Loading articles...', 'news')}</p>
-                        </div>
-                    )}
-                    
-                    {error && (
-                        <div className="news-article-layout-error">
-                            <p>{__('Error:', 'news')} {error}</p>
-                        </div>
-                    )}
-                    
-                    {!loading && !error && (
-                        <ArticleLayout 
-                            articles={articles} 
-                            showExcerpt={showExcerpt}
-                            showDate={showDate}
-                        />
-                    )}
-                </div>
-            </>
+            namespace === HERO_GRID_LIST_VARIATION_NAME
+            && query.postType === 'news'
         );
     },
+    icon: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3Z" fill="currentColor"/>
+            <path d="M4 5H20V7H4V5ZM4 9H12V19H4V9ZM14 9H20V11H14V9ZM14 13H20V15H14V13ZM14 17H20V19H14V17Z" fill="white"/>
+        </svg>
+    ),
+    attributes: {
+        namespace: HERO_GRID_LIST_VARIATION_NAME,
+        query: {
+            perPage: 6,
+            pages: 0,
+            offset: 0,
+            postType: 'news',
+            order: 'desc',
+            orderBy: 'date',
+            author: '',
+            search: '',
+            exclude: [],
+            sticky: '',
+            inherit: false,
+        },
+    },
+    scope: ['inserter'],
+    innerBlocks: [
+        [
+            'core/post-template',
+            {
+                layout: {
+                    type: 'grid',
+                    columnCount: 3,
+                },
+            },
+            [
+                ['core/post-featured-image'],
+                ['core/post-title'],
+                ['core/post-excerpt'],
+                ['core/post-date'],
+                ['news/news-post-byline'],
+            ],
+        ],
+        ['core/query-pagination'],
+        ['core/query-no-results'],
+    ],
+});
 
-    save: function Save() {
-        return null; // Dynamic block
-    }
+// Hero List variation for News Articles
+const HERO_LIST_VARIATION_NAME = 'news/article-layout-hero-list';
+
+registerBlockVariation('core/query', {
+    name: HERO_LIST_VARIATION_NAME,
+    title: __('News Article Layout - Hero List', 'news'),
+    description: __('Display news articles in a hero-list layout with featured article as hero', 'news'),
+    isActive: ({ namespace, query }) => {
+    return (
+            namespace === HERO_LIST_VARIATION_NAME
+            && query.postType === 'news'
+        );
+    },
+    icon: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3Z" fill="currentColor"/>
+            <path d="M4 5H20V7H4V5ZM4 9H20V11H4V9ZM4 13H20V15H4V13ZM4 17H20V19H4V17Z" fill="white"/>
+        </svg>
+    ),
+    attributes: {
+        namespace: HERO_LIST_VARIATION_NAME,
+        query: {
+            perPage: 8,
+            pages: 0,
+            offset: 0,
+            postType: 'news',
+            order: 'desc',
+            orderBy: 'date',
+            author: '',
+            search: '',
+            exclude: [],
+            sticky: '',
+            inherit: false,
+        },
+    },
+    scope: ['inserter'],
+    innerBlocks: [
+        [
+            'core/post-template',
+            {
+                layout: {
+                    type: 'flex',
+                    orientation: 'vertical',
+                },
+            },
+            [
+                ['core/post-featured-image'],
+                ['core/post-title'],
+                ['core/post-excerpt'],
+                ['core/post-date'],
+                ['news/news-post-byline'],
+            ],
+        ],
+        ['core/query-pagination'],
+        ['core/query-no-results'],
+    ],
+});
+
+// Grid List variation for News Articles
+const GRID_LIST_VARIATION_NAME = 'news/article-layout-grid-list';
+
+registerBlockVariation('core/query', {
+    name: GRID_LIST_VARIATION_NAME,
+    title: __('News Article Layout - Grid List', 'news'),
+    description: __('Display news articles in a grid-list layout', 'news'),
+    isActive: ({ namespace, query }) => {
+        return (
+            namespace === GRID_LIST_VARIATION_NAME
+            && query.postType === 'news'
+        );
+    },
+    icon: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3Z" fill="currentColor"/>
+            <path d="M4 5H8V7H4V5ZM4 9H8V11H4V9ZM4 13H8V15H4V13ZM4 17H8V19H4V17ZM10 5H20V7H10V5ZM10 9H20V11H10V9ZM10 13H20V15H10V13ZM10 17H20V19H10V17Z" fill="white"/>
+        </svg>
+    ),
+    attributes: {
+        namespace: GRID_LIST_VARIATION_NAME,
+        query: {
+            perPage: 9,
+            pages: 0,
+            offset: 0,
+            postType: 'news',
+            order: 'desc',
+            orderBy: 'date',
+            author: '',
+            search: '',
+            exclude: [],
+            sticky: '',
+            inherit: false,
+        },
+    },
+    scope: ['inserter'],
+    innerBlocks: [
+        [
+            'core/post-template',
+            {
+                layout: {
+                    type: 'grid',
+                    columnCount: 3,
+                },
+            },
+            [
+                ['core/post-featured-image'],
+                ['core/post-title'],
+                ['core/post-excerpt'],
+                ['core/post-date'],
+                ['news/news-post-byline'],
+            ],
+        ],
+        ['core/query-pagination'],
+        ['core/query-no-results'],
+    ],
+});
+
+// Featured Grid variation for News Articles
+const FEATURED_GRID_VARIATION_NAME = 'news/article-layout-featured-grid';
+
+registerBlockVariation('core/query', {
+    name: FEATURED_GRID_VARIATION_NAME,
+    title: __('News Article Layout - Featured Grid', 'news'),
+    description: __('Display news articles in a featured grid layout highlighting important stories', 'news'),
+    isActive: ({ namespace, query }) => {
+        return (
+            namespace === FEATURED_GRID_VARIATION_NAME
+            && query.postType === 'news'
+        );
+    },
+    icon: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3Z" fill="currentColor"/>
+            <path d="M4 5H20V7H4V5ZM4 9H12V19H4V9ZM14 9H20V11H14V9ZM14 13H20V15H14V13ZM14 17H20V19H14V17Z" fill="white"/>
+        </svg>
+    ),
+    attributes: {
+        namespace: FEATURED_GRID_VARIATION_NAME,
+        query: {
+            perPage: 7,
+            pages: 0,
+            offset: 0,
+            postType: 'news',
+            order: 'desc',
+            orderBy: 'date',
+            author: '',
+            search: '',
+            exclude: [],
+            sticky: '',
+            inherit: false,
+        },
+    },
+    scope: ['inserter'],
+    innerBlocks: [
+        [
+            'core/post-template',
+            {
+                layout: {
+                    type: 'grid',
+                    columnCount: 2,
+                },
+            },
+            [
+                ['news/news-post-featured'],
+                ['core/post-featured-image'],
+                ['core/post-title'],
+                ['core/post-excerpt'],
+                ['core/post-date'],
+                ['news/news-post-byline'],
+            ],
+        ],
+        ['core/query-pagination'],
+        ['core/query-no-results'],
+    ],
 });

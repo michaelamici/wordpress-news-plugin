@@ -21,23 +21,5 @@
       "background": true,
       "text": true
     }
-  },
-  "attributes": {
-    "gridCount": {
-      "type": "number",
-      "default": 3
-    },
-    "sectionFilter": {
-      "type": "string",
-      "default": ""
-    },
-    "showExcerpt": {
-      "type": "boolean",
-      "default": true
-    },
-    "showDate": {
-      "type": "boolean",
-      "default": true
-    }
   }
 }
