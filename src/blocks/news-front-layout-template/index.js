@@ -3,12 +3,16 @@ import { useBlockProps, InnerBlocks } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useEntityRecord } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
+import { createContext, useContext } from '@wordpress/element';
 
 import metadata from './block.json';
 
+// Create context for passing post data to child blocks
+const PostContext = createContext({});
+
 /**
  * Edit component for the news/article-post-template block
- * Based on WordPress core post-template implementation
+ * Enhanced to show real article data in editor preview
  */
 function Edit({ context, clientId, attributes }) {
     const blockProps = useBlockProps({
@@ -23,6 +27,12 @@ function Edit({ context, clientId, attributes }) {
     // Fetch the post data for preview
     const { record: post, hasResolved } = useEntityRecord('postType', postType, postId);
     
+    // Get post meta for badges and flags
+    const postMeta = useSelect((select) => {
+        if (!postId) return {};
+        return select('core').getEntityRecord('postType', postType, postId, { _embed: true });
+    }, [postId, postType]);
+    
     // Check if this block has any inner blocks
     const hasInnerBlocks = useSelect((select) => {
         const { getBlocks } = select('core/block-editor');
@@ -30,8 +40,52 @@ function Edit({ context, clientId, attributes }) {
         return innerBlocks.length > 0;
     }, [clientId]);
 
-    // Default template that only applies when block is empty
-    const defaultTemplate = [
+    // Position-specific templates
+    const getTemplateForPosition = (position) => {
+        switch (position) {
+            case 'hero':
+                return [
+                    ['core/group', { className: 'news-article-header news-article-header--hero' }, [
+                        ['news/post-featured', {}],
+                        ['news/post-breaking', {}],
+                        ['core/post-title', { level: 1, textAlign: 'left' }],
+                        ['news/post-byline', {}]
+                    ]],
+                    ['core/group', { className: 'news-article-meta news-article-meta--hero' }, [
+                        ['news/post-last-updated', {}],
+                        ['news/post-exclusive', {}],
+                        ['news/post-sponsored', {}],
+                        ['news/post-live', {}]
+                    ]],
+                    ['core/post-featured-image', { sizeSlug: 'large', align: 'wide' }],
+                    ['core/post-excerpt', { moreText: __('Read more', 'news') }],
+                    ['core/read-more', {}]
+                ];
+            case 'grid':
+                return [
+                    ['core/group', { className: 'news-article-header news-article-header--grid' }, [
+                        ['news/post-featured', {}],
+                        ['news/post-breaking', {}],
+                        ['core/post-title', { level: 3, textAlign: 'left' }],
+                        ['news/post-byline', {}]
+                    ]],
+                    ['core/post-featured-image', { sizeSlug: 'medium' }],
+                    ['core/post-excerpt', { moreText: __('Read more', 'news') }],
+                    ['core/read-more', {}]
+                ];
+            case 'list':
+                return [
+                    ['core/group', { className: 'news-article-header news-article-header--list' }, [
+                        ['news/post-featured', {}],
+                        ['news/post-breaking', {}],
+                        ['core/post-title', { level: 4, textAlign: 'left' }],
+                        ['news/post-byline', {}]
+                    ]],
+                    ['core/post-excerpt', { moreText: __('Read more', 'news') }],
+                    ['core/read-more', {}]
+                ];
+            default:
+                return [
         ['core/group', { className: 'news-article-header' }, [
             ['news/post-featured', {}],
             ['core/post-title', { level: 1, textAlign: 'left' }],
@@ -48,6 +102,10 @@ function Edit({ context, clientId, attributes }) {
         ['core/post-excerpt', {}],
         ['core/read-more', {}]
     ];
+        }
+    };
+
+    const defaultTemplate = getTemplateForPosition(position);
     
     // Show loading state
     if (!hasResolved) {
@@ -71,7 +129,17 @@ function Edit({ context, clientId, attributes }) {
         );
     }
     
+    // Create context value for child blocks
+    const contextValue = {
+        postId: post.id,
+        postType: postType,
+        position: position,
+        post: post,
+        meta: postMeta
+    };
+    
     return (
+        <PostContext.Provider value={contextValue}>
         <div {...blockProps}>
             <div className="news-article-template-preview">
                 <div className="news-article-template-header">
@@ -99,6 +167,7 @@ function Edit({ context, clientId, attributes }) {
                 />
             </div>
         </div>
+        </PostContext.Provider>
     );
 }
 
