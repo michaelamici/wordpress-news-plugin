@@ -11,9 +11,9 @@ import metadata from './block.json';
 function Edit({ context }) {
     const blockProps = useBlockProps();
     
-    // Get post ID and post type from Query Loop context
-    const postId = context?.postId;
-    const postType = context?.postType;
+    // Get post ID and post type from context (handle both formats)
+    const postId = context?.['news/postId'] || context?.postId;
+    const postType = context?.['news/postType'] || context?.postType;
     
     // Get the sponsored flag from post meta
     const isSponsored = useSelect((select) => {

@@ -11,9 +11,9 @@ import metadata from './block.json';
 function Edit({ context }) {
     const blockProps = useBlockProps();
     
-    // Get post ID and post type from Query Loop context
-    const postId = context?.postId;
-    const postType = context?.postType;
+    // Get post ID and post type from context (handle both formats)
+    const postId = context?.['news/postId'] || context?.postId;
+    const postType = context?.['news/postType'] || context?.postType;
     
     // Get the live flag from post meta
     const isLive = useSelect((select) => {
@@ -42,7 +42,7 @@ function Edit({ context }) {
             <div className="news-post-live-editor">
                 {isLive ? (
                     <span className="news-post-live-badge">
-                        {__('queef', 'news')}
+                        {__('LIVE', 'news')}
                     </span>
                 ) : (
                     <span className="news-post-live-empty">

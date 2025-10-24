@@ -1,0 +1,64 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "news/article-post-template",
+  "version": "1.0.0",
+  "title": "News Article Post Template",
+  "category": "news",
+  "icon": "layout",
+  "description": "A post template for news articles that displays within the Front Layout block",
+  "keywords": ["news", "articles", "template", "post", "front"],
+  "textdomain": "news",
+  "editorScript": "file:./index.js",
+  "style": "file:./style.css",
+  "render": "file:./render.php",
+  "attributes": {
+    "postId": {
+      "type": "number"
+    },
+    "postType": {
+      "type": "string",
+      "default": "news"
+    },
+    "position": {
+      "type": "string",
+      "default": "hero"
+    }
+  },
+  "templateLock": false,
+  "parent": ["news/front-layout"],
+  "usesContext": ["news/postId", "news/postType", "news/position", "postId", "postType"],
+  "providesContext": {
+    "news/postId": "postId",
+    "news/postType": "postType",
+    "news/position": "position",
+    "postId": "postId",
+    "postType": "postType"
+  },
+  "supports": {
+    "reusable": false,
+    "html": false,
+    "align": true,
+    "layout": true,
+    "spacing": {
+      "padding": true,
+      "margin": true
+    },
+    "innerBlocks": {
+      "allowedBlocks": [
+        "core/group",
+        "core/post-title",
+        "core/post-featured-image", 
+        "core/post-excerpt",
+        "core/read-more",
+        "news/post-featured",
+        "news/post-byline",
+        "news/post-last-updated",
+        "news/post-breaking",
+        "news/post-exclusive",
+        "news/post-sponsored",
+        "news/post-live"
+      ]
+    }
+  }
+}

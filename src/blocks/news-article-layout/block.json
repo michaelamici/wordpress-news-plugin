@@ -1,16 +1,23 @@
 {
   "$schema": "https://schemas.wp.org/trunk/block.json",
   "apiVersion": 3,
-  "name": "news/article-layout",
+  "name": "news/front-layout",
   "version": "1.0.0",
-  "title": "News Article Layout",
+  "title": "News Front Layout",
   "category": "news",
   "icon": "layout",
-  "description": "Display news articles in a hero-grid-list layout with featured article as hero.",
-  "keywords": ["news", "articles", "layout", "hero", "grid", "list"],
+  "description": "Display news articles in a hero-grid-list layout with position-aware rendering.",
+  "keywords": ["news", "articles", "layout", "hero", "grid", "list", "front"],
   "textdomain": "news",
   "editorScript": "file:./index.js",
   "style": "file:./style.css",
+  "render": "file:./render.php",
+  "providesContext": {
+    "news/postId": "postId",
+    "news/postType": "postType",
+    "news/position": "position"
+  },
+  "usesContext": ["postId", "postType", "position"],
   "supports": {
     "align": ["wide", "full"],
     "spacing": {
@@ -20,6 +27,9 @@
     "color": {
       "background": true,
       "text": true
+    },
+    "innerBlocks": {
+      "allowedBlocks": ["news/article-post-template"]
     }
   }
 }

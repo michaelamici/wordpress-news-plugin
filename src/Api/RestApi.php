@@ -207,6 +207,62 @@ class RestApi
             ],
         ]);
 
+        // Article layout endpoint for custom post template
+        register_rest_route(self::NAMESPACE, '/article-layout', [
+            'methods' => 'GET',
+            'callback' => [$this, 'getArticleLayout'],
+            'permission_callback' => '__return_true',
+            'args' => [
+                'per_page' => [
+                    'type' => 'integer',
+                    'default' => 10,
+                    'maximum' => 100,
+                    'sanitize_callback' => 'absint',
+                ],
+                'offset' => [
+                    'type' => 'integer',
+                    'default' => 0,
+                    'sanitize_callback' => 'absint',
+                ],
+                'section' => [
+                    'type' => 'string',
+                    'sanitize_callback' => 'sanitize_text_field',
+                ],
+                'orderby' => [
+                    'type' => 'string',
+                    'default' => 'date',
+                    'sanitize_callback' => 'sanitize_text_field',
+                ],
+                'order' => [
+                    'type' => 'string',
+                    'default' => 'DESC',
+                    'sanitize_callback' => 'sanitize_text_field',
+                ],
+                'heroCount' => [
+                    'type' => 'integer',
+                    'default' => 1,
+                    'minimum' => 0,
+                    'maximum' => 3,
+                    'sanitize_callback' => 'absint',
+                ],
+                'gridCount' => [
+                    'type' => 'integer',
+                    'default' => 3,
+                    'minimum' => 0,
+                    'maximum' => 12,
+                    'sanitize_callback' => 'absint',
+                ],
+                'featured' => [
+                    'type' => 'boolean',
+                    'sanitize_callback' => 'rest_sanitize_boolean',
+                ],
+                'breaking' => [
+                    'type' => 'boolean',
+                    'sanitize_callback' => 'rest_sanitize_boolean',
+                ],
+            ],
+        ]);
+
     }
 
     /**
@@ -595,6 +651,98 @@ class RestApi
     }
 
     /**
+     * Get article layout for post template block
+     */
+    public function getArticleLayout(WP_REST_Request $request): WP_REST_Response
+    {
+        $per_page = $request->get_param('per_page');
+        $offset = $request->get_param('offset');
+        $section = $request->get_param('section');
+        $orderby = $request->get_param('orderby');
+        $order = $request->get_param('order');
+        $heroCount = $request->get_param('heroCount');
+        $gridCount = $request->get_param('gridCount');
+        $featured = $request->get_param('featured');
+        $breaking = $request->get_param('breaking');
+
+        // Build query arguments
+        $query_args = [
+            'post_type' => 'news',
+            'post_status' => 'publish',
+            'posts_per_page' => $per_page,
+            'offset' => $offset,
+            'orderby' => $orderby,
+            'order' => $order,
+        ];
+
+        // Add section filter if specified
+        if (!empty($section)) {
+            $query_args['tax_query'] = [
+                [
+                    'taxonomy' => 'news_section',
+                    'field' => 'slug',
+                    'terms' => $section,
+                ],
+            ];
+        }
+
+        // Add meta queries for featured/breaking if specified
+        $meta_query = [];
+        if ($featured) {
+            $meta_query[] = [
+                'key' => '_news_featured',
+                'value' => '1',
+                'compare' => '='
+            ];
+        }
+        if ($breaking) {
+            $meta_query[] = [
+                'key' => '_news_breaking',
+                'value' => '1',
+                'compare' => '='
+            ];
+        }
+        if (!empty($meta_query)) {
+            $query_args['meta_query'] = $meta_query;
+        }
+
+        // Execute query
+        $query = new \WP_Query($query_args);
+        $posts = $query->posts;
+
+        // Split posts into sections
+        $hero_posts = array_slice($posts, 0, $heroCount);
+        $grid_posts = array_slice($posts, $heroCount, $gridCount);
+        $list_posts = array_slice($posts, $heroCount + $gridCount);
+
+        // Format posts for response
+        $format_post = function($post) {
+            return [
+                'id' => $post->ID,
+                'title' => get_the_title($post->ID),
+                'excerpt' => get_the_excerpt($post->ID),
+                'date' => get_the_date('', $post->ID),
+                'url' => get_permalink($post->ID),
+                'featured_image' => get_the_post_thumbnail_url($post->ID, 'large'),
+                'byline' => get_post_meta($post->ID, '_news_byline', true),
+                'featured' => get_post_meta($post->ID, '_news_featured', true),
+                'breaking' => get_post_meta($post->ID, '_news_breaking', true),
+            ];
+        };
+
+        $response_data = [
+            'hero' => array_map($format_post, $hero_posts),
+            'grid' => array_map($format_post, $grid_posts),
+            'list' => array_map($format_post, $list_posts),
+            'total' => $query->found_posts,
+        ];
+
+        wp_reset_postdata();
+
+        return new WP_REST_Response($response_data, 200);
+    }
+
+    /**
      * Get API documentation
      */
     public function getApiDocumentation(): array
@@ -616,6 +764,9 @@ class RestApi
                 ],
                 'analytics' => [
                     'GET /analytics' => 'Get analytics data',
+                ],
+                'layout' => [
+                    'GET /article-layout' => 'Get article layout for post template',
                 ],
             ],
         ];
