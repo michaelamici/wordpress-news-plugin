@@ -2,72 +2,11 @@ import { registerBlockType } from '@wordpress/blocks';
 import { useBlockProps, InnerBlocks, InspectorControls } from '@wordpress/block-editor';
 import { useEntityRecords } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
-import { createContext } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { PanelBody, SelectControl, RangeControl, TextControl } from '@wordpress/components';
 
 import metadata from './block.json';
 
-// Create context for passing layout data to child blocks
-const LayoutContext = createContext({});
-
-/**
- * Hero Template Renderer Component
- * Renders the actual Gutenberg template block in the hero position
- */
-function HeroTemplateRenderer({ heroPost, templateBlock, clientId }) {
-    if (!templateBlock || !heroPost) {
-        return null;
-    }
-
-    // Get the template block's edit component from the block registry
-    const templateEditComponent = useSelect((select) => {
-        const { getBlockType } = select('core/blocks');
-        const blockType = getBlockType('news/article-hero-post-template');
-        return blockType?.edit;
-    }, []);
-
-    if (!templateEditComponent) {
-        return (
-            <div className="news-hero-template-placeholder">
-                <div className="news-hero-template-indicator">
-                    <span className="news-hero-template-badge">
-                        {__('Template Active', 'news')}
-                    </span>
-                    <p>{__('Template block will render here with real article data', 'news')}</p>
-                </div>
-            </div>
-        );
-    }
-
-    // Create context for the template block
-    const templateContext = {
-        'news/postId': heroPost.id,
-        'news/postType': 'news',
-        'news/position': 'hero'
-    };
-
-    // Create attributes for the template block
-    const templateAttributes = {
-        postId: heroPost.id,
-        postType: 'news',
-        position: 'hero'
-    };
-
-    // Render the actual template block component
-    return (
-        <div className="news-hero-template-rendered">
-            {templateEditComponent({
-                context: templateContext,
-                attributes: templateAttributes,
-                clientId: `${clientId}-hero-template`,
-                setAttributes: () => {}, // No-op for preview
-                isSelected: false,
-                className: 'news-article-post-template news-article-post-template--hero'
-            })}
-        </div>
-    );
-}
 
 /**
  * Edit component for the news/front-layout block
@@ -99,14 +38,6 @@ function Edit({ attributes, setAttributes, clientId }) {
         });
     }
 
-    // Create layout context for child blocks
-    const layoutContext = {
-        heroPost: heroPost,
-        listPosts: listPosts,
-        totalPosts: posts?.length || 0,
-        layoutType: 'front-layout'
-    };
-
     // Get the template block for the hero position
     const heroTemplateBlock = useSelect((select) => {
         if (!clientId) return null;
@@ -117,7 +48,7 @@ function Edit({ attributes, setAttributes, clientId }) {
 
     const hasHeroTemplate = !!heroTemplateBlock;
 
-    const renderPreview = () => {
+    const renderListPreview = () => {
         if (!hasResolved) {
             return <p>{__('Loading articles...', 'news')}</p>;
         }
@@ -126,39 +57,21 @@ function Edit({ attributes, setAttributes, clientId }) {
             return <p>{__('No articles found. Create some news articles to see the preview.', 'news')}</p>;
         }
 
-        return (
-            <div className="news-front-layout-preview">
-                {/* Hero Article - Show template if available, otherwise default */}
-                {heroPost && (
-                    <div className="news-front-layout__hero">
-                        {hasHeroTemplate ? (
-                            <HeroTemplateRenderer 
-                                heroPost={heroPost} 
-                                templateBlock={heroTemplateBlock}
-                                clientId={clientId}
-                            />
-                        ) : (
-                        <div className="news-hero-article">
-                            <h4>{heroPost.title.rendered}</h4>
-                            <div className="news-hero-excerpt" dangerouslySetInnerHTML={{ __html: heroPost.excerpt.rendered }} />
-                        </div>
-                        )}
-                    </div>
-                )}
+        // Only show list items as preview (hero is handled by InnerBlocks)
+        if (listPosts.length === 0) {
+            return null;
+        }
 
-                {/* List Articles */}
-                {listPosts.length > 0 && (
-                    <div className="news-front-layout__list">
-                        <div className="news-list">
-                            {listPosts.map((post) => (
-                                <div key={post.id} className="news-list-item">
-                                    <h6>{post.title.rendered}</h6>
-                                    <div className="news-list-excerpt" dangerouslySetInnerHTML={{ __html: post.excerpt.rendered }} />
-                                </div>
-                            ))}
+        return (
+            <div className="news-front-layout__list">
+                <div className="news-list">
+                    {listPosts.map((post) => (
+                        <div key={post.id} className="news-list-item">
+                            <h6>{post.title.rendered}</h6>
+                            <div className="news-list-excerpt" dangerouslySetInnerHTML={{ __html: post.excerpt.rendered }} />
                         </div>
-                    </div>
-                )}
+                    ))}
+                </div>
             </div>
         );
     };
@@ -203,30 +116,24 @@ function Edit({ attributes, setAttributes, clientId }) {
                 </PanelBody>
             </InspectorControls>
             
-            <LayoutContext.Provider value={layoutContext}>
             <div {...blockProps}>
-                <div className="news-front-layout-editor">
-                    <h4>{__('News Front Layout', 'news')}</h4>
-                    
-                    {renderPreview()}
-                    
-                    <div className="news-front-layout-template-section">
+                <div className="news-front-layout">
+                    {/* Hero Template - InnerBlocks serves as both editor and preview */}
+                    <div className="news-front-layout__hero">
                         <InnerBlocks 
                             allowedBlocks={['news/article-hero-post-template']}
                             template={[
-                                ['news/article-hero-post-template', {
-                                    postId: heroPost?.id || 0,
-                                    postType: 'news',
-                                    position: 'hero'
-                                }]
+                                ['news/article-hero-post-template', {}]
                             ]}
                             templateLock={false}
                             renderAppender={InnerBlocks.ButtonBlockAppender}
                         />
                     </div>
+                    
+                    {/* List Articles Preview */}
+                    {renderListPreview()}
                 </div>
             </div>
-            </LayoutContext.Provider>
         </>
     );
 }

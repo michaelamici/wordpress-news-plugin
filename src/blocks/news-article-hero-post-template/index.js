@@ -3,26 +3,33 @@ import { useBlockProps, InnerBlocks } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useEntityRecord } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
-import { createContext } from '@wordpress/element';
 
 import metadata from './block.json';
-
-// Create context for passing post data to child blocks
-const PostContext = createContext({});
 
 /**
  * Edit component for the news/article-hero-post-template block
  * Simplified for hero position only
  */
-function Edit({ context, clientId, attributes }) {
+function Edit({ context, clientId, attributes, setAttributes }) {
     const blockProps = useBlockProps({
         className: 'news-article-hero-post-template'
     });
     
     // Get post context from parent block or attributes
-    const postId = context?.['news/postId'] || attributes?.postId || context?.postId;
-    const postType = context?.['news/postType'] || attributes?.postType || context?.postType || 'news';
+    // Prioritize standard WordPress context keys that core blocks expect
+    const postId = context?.postId || context?.['news/postId'] || attributes?.postId;
+    const postType = context?.postType || context?.['news/postType'] || attributes?.postType || 'news';
     const position = context?.['news/position'] || attributes?.position || 'hero';
+    
+    // Sync context to attributes so providesContext can pass them to children
+    // This is critical for WordPress core blocks to receive the context
+    if (postId && (attributes.postId !== postId || attributes.postType !== postType)) {
+        setAttributes({
+            postId: postId,
+            postType: postType,
+            position: position
+        });
+    }
     
     // Fetch the post data for preview
     const { record: post, hasResolved } = useEntityRecord('postType', postType, postId);
@@ -74,17 +81,7 @@ function Edit({ context, clientId, attributes }) {
         );
     }
     
-    // Create context value for child blocks
-    const contextValue = {
-        postId: post.id,
-        postType: postType,
-        position: position,
-        post: post,
-        meta: postMeta
-    };
-    
     return (
-        <PostContext.Provider value={contextValue}>
         <div {...blockProps}>
             <InnerBlocks 
                 template={hasInnerBlocks ? undefined : defaultTemplate}
@@ -103,7 +100,6 @@ function Edit({ context, clientId, attributes }) {
                 renderAppender={InnerBlocks.ButtonBlockAppender}
             />
         </div>
-        </PostContext.Provider>
     );
 }
 

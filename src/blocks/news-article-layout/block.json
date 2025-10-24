@@ -13,6 +13,17 @@
   "style": "file:./style.css",
   "render": "file:./render.php",
   "attributes": {
+    "postId": {
+      "type": "number"
+    },
+    "postType": {
+      "type": "string",
+      "default": "news"
+    },
+    "position": {
+      "type": "string",
+      "default": "hero"
+    },
     "postsPerPage": {
       "type": "number",
       "default": 10
@@ -33,7 +44,9 @@
   "providesContext": {
     "news/postId": "postId",
     "news/postType": "postType",
-    "news/position": "position"
+    "news/position": "position",
+    "postId": "postId",
+    "postType": "postType"
   },
   "usesContext": ["postId", "postType", "position"],
   "supports": {
