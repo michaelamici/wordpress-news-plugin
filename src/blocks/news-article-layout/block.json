@@ -6,12 +6,30 @@
   "title": "News Front Layout",
   "category": "news",
   "icon": "layout",
-  "description": "Display news articles in a hero-grid-list layout with position-aware rendering.",
-  "keywords": ["news", "articles", "layout", "hero", "grid", "list", "front"],
+  "description": "Display news articles in a hero-list layout with customizable hero template.",
+  "keywords": ["news", "articles", "layout", "hero", "list", "front", "query"],
   "textdomain": "news",
   "editorScript": "file:./index.js",
   "style": "file:./style.css",
   "render": "file:./render.php",
+  "attributes": {
+    "postsPerPage": {
+      "type": "number",
+      "default": 10
+    },
+    "orderBy": {
+      "type": "string",
+      "default": "date"
+    },
+    "order": {
+      "type": "string",
+      "default": "desc"
+    },
+    "sectionFilter": {
+      "type": "string",
+      "default": ""
+    }
+  },
   "providesContext": {
     "news/postId": "postId",
     "news/postType": "postType",
@@ -29,7 +47,7 @@
       "text": true
     },
     "innerBlocks": {
-      "allowedBlocks": ["news/article-post-template"]
+      "allowedBlocks": ["news/article-hero-post-template"]
     }
   }
 }

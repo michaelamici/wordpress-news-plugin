@@ -37,8 +37,7 @@ class FrontLayoutRenderer
 
         // Organize posts by position
         $hero_post = !empty($all_posts) ? $all_posts[0] : null;
-        $grid_posts = array_slice($all_posts, 1, $grid_count);
-        $list_posts = array_slice($all_posts, $grid_count + 1);
+        $list_posts = array_slice($all_posts, 1); // All remaining posts as list
 
         // Start output with hooks
         do_action('news_before_front_layout', $attributes, $block);
@@ -47,7 +46,6 @@ class FrontLayoutRenderer
 
         // Render sections
         $output .= self::renderHeroSection($hero_post, $block);
-        $output .= self::renderGridSection($grid_posts);
         $output .= self::renderListSection($list_posts);
 
         $output .= '</div>';
@@ -141,29 +139,6 @@ class FrontLayoutRenderer
         return $output;
     }
 
-    /**
-     * Render grid section
-     * 
-     * @param array $grid_posts Array of post objects
-     * @return string Rendered HTML
-     */
-    private static function renderGridSection(array $grid_posts): string
-    {
-        if (empty($grid_posts)) {
-            return '';
-        }
-
-        $output = '<div class="news-front-layout__grid">';
-        $output .= '<div class="news-grid">';
-        
-        foreach ($grid_posts as $post) {
-            $output .= self::renderGridItem($post);
-        }
-        
-        $output .= '</div>';
-        $output .= '</div>';
-        return $output;
-    }
 
     /**
      * Render list section
@@ -202,7 +177,7 @@ class FrontLayoutRenderer
         }
 
         foreach ($block->inner_blocks as $inner_block) {
-            if ($inner_block->name === 'news/article-post-template') {
+            if ($inner_block->name === 'news/article-hero-post-template') {
                 return $inner_block;
             }
         }
@@ -249,44 +224,6 @@ class FrontLayoutRenderer
         return $output;
     }
 
-    /**
-     * Render grid item
-     * 
-     * @param \WP_Post $post Post object
-     * @return string Rendered HTML
-     */
-    private static function renderGridItem(\WP_Post $post): string
-    {
-        $post_image = get_the_post_thumbnail($post->ID, 'medium');
-        $post_url = get_permalink($post->ID);
-        $post_title = get_the_title($post->ID);
-        $post_excerpt = get_the_excerpt($post->ID);
-        $post_date = get_the_date('', $post->ID);
-        
-        $output = '<article class="news-grid-item">';
-        
-        if ($post_image) {
-            $output .= '<div class="news-grid-image">';
-            $output .= '<a href="' . esc_url($post_url) . '">' . $post_image . '</a>';
-            $output .= '</div>';
-        }
-        
-        $output .= '<div class="news-grid-content">';
-        $output .= '<h3 class="news-grid-title"><a href="' . esc_url($post_url) . '">' . esc_html($post_title) . '</a></h3>';
-        
-        if ($post_excerpt) {
-            $output .= '<div class="news-grid-excerpt">' . wp_kses_post($post_excerpt) . '</div>';
-        }
-        
-        if ($post_date) {
-            $output .= '<div class="news-grid-date">' . esc_html($post_date) . '</div>';
-        }
-        
-        $output .= '</div>';
-        $output .= '</article>';
-        
-        return $output;
-    }
 
     /**
      * Render list item

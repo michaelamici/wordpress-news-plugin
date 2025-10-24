@@ -56,163 +56,10 @@ class BlockManager
      */
     public function registerBlocks(): void
     {
-        $this->registerNewsPostBylineBlock();
-        $this->registerNewsPostFeaturedBlock();
-        $this->registerNewsPostBreakingBlock();
-        $this->registerNewsPostExclusiveBlock();
-        $this->registerNewsPostSponsoredBlock();
-        $this->registerNewsPostLiveBlock();
-        $this->registerNewsPostLastUpdatedBlock();
         $this->registerNewsArticleLayoutBlock();
         $this->registerNewsArticlePostTemplateBlock();
     }
 
-    /**
-     * Register news post byline block
-     */
-    private function registerNewsPostBylineBlock(): void
-    {
-        $block_json_path = plugin_dir_path(__FILE__) . '../../build/blocks/news-post-byline/block.json';
-        
-        if (!file_exists($block_json_path)) {
-            error_log('News Plugin: Block JSON file not found at: ' . $block_json_path);
-            return;
-        }
-        
-        // Register block using block.json for editor support
-        $block_type = register_block_type($block_json_path);
-        
-        // Override the render callback to use our clean renderer
-        if ($block_type) {
-            $block_type->render_callback = [\NewsPlugin\Blocks\Renderers\BylineRenderer::class, 'render'];
-        }
-    }
-
-    /**
-     * Register news post featured block
-     */
-    private function registerNewsPostFeaturedBlock(): void
-    {
-        $block_json_path = plugin_dir_path(__FILE__) . '../../build/blocks/news-post-featured/block.json';
-        
-        if (!file_exists($block_json_path)) {
-            error_log('News Plugin: Featured Block JSON file not found at: ' . $block_json_path);
-            return;
-        }
-        
-        // Register block using block.json for editor support
-        $block_type = register_block_type($block_json_path);
-        
-        // Override the render callback to use our clean renderer
-        if ($block_type) {
-            $block_type->render_callback = [\NewsPlugin\Blocks\Renderers\FeaturedRenderer::class, 'render'];
-        }
-    }
-
-    /**
-     * Register news post breaking block
-     */
-    private function registerNewsPostBreakingBlock(): void
-    {
-        $block_json_path = plugin_dir_path(__FILE__) . '../../build/blocks/news-post-breaking/block.json';
-        
-        if (!file_exists($block_json_path)) {
-            error_log('News Plugin: Breaking Block JSON file not found at: ' . $block_json_path);
-            return;
-        }
-        
-        // Register block using block.json for editor support
-        $block_type = register_block_type($block_json_path);
-        
-        // Override the render callback to use our clean renderer
-        if ($block_type) {
-            $block_type->render_callback = [\NewsPlugin\Blocks\Renderers\BreakingRenderer::class, 'render'];
-        }
-    }
-
-    /**
-     * Register news post exclusive block
-     */
-    private function registerNewsPostExclusiveBlock(): void
-    {
-        $block_json_path = plugin_dir_path(__FILE__) . '../../build/blocks/news-post-exclusive/block.json';
-        
-        if (!file_exists($block_json_path)) {
-            error_log('News Plugin: Exclusive Block JSON file not found at: ' . $block_json_path);
-            return;
-        }
-        
-        // Register block using block.json for editor support
-        $block_type = register_block_type($block_json_path);
-        
-        // Override the render callback to use our clean renderer
-        if ($block_type) {
-            $block_type->render_callback = [\NewsPlugin\Blocks\Renderers\ExclusiveRenderer::class, 'render'];
-        }
-    }
-
-    /**
-     * Register news post sponsored block
-     */
-    private function registerNewsPostSponsoredBlock(): void
-    {
-        $block_json_path = plugin_dir_path(__FILE__) . '../../build/blocks/news-post-sponsored/block.json';
-        
-        if (!file_exists($block_json_path)) {
-            error_log('News Plugin: Sponsored Block JSON file not found at: ' . $block_json_path);
-            return;
-        }
-        
-        // Register block using block.json for editor support
-        $block_type = register_block_type($block_json_path);
-        
-        // Override the render callback to use our clean renderer
-        if ($block_type) {
-            $block_type->render_callback = [\NewsPlugin\Blocks\Renderers\SponsoredRenderer::class, 'render'];
-        }
-    }
-
-    /**
-     * Register news post live block
-     */
-    private function registerNewsPostLiveBlock(): void
-    {
-        $block_json_path = plugin_dir_path(__FILE__) . '../../build/blocks/news-post-live/block.json';
-        
-        if (!file_exists($block_json_path)) {
-            error_log('News Plugin: Live Block JSON file not found at: ' . $block_json_path);
-            return;
-        }
-        
-        // Register block using block.json for editor support
-        $block_type = register_block_type($block_json_path);
-        
-        // Override the render callback to use our clean renderer
-        if ($block_type) {
-            $block_type->render_callback = [\NewsPlugin\Blocks\Renderers\LiveRenderer::class, 'render'];
-        }
-    }
-
-    /**
-     * Register news post last updated block
-     */
-    private function registerNewsPostLastUpdatedBlock(): void
-    {
-        $block_json_path = plugin_dir_path(__FILE__) . '../../build/blocks/news-post-last-updated/block.json';
-        
-        if (!file_exists($block_json_path)) {
-            error_log('News Plugin: Last Updated Block JSON file not found at: ' . $block_json_path);
-            return;
-        }
-        
-        // Register block using block.json for editor support
-        $block_type = register_block_type($block_json_path);
-        
-        // Override the render callback to use our clean renderer
-        if ($block_type) {
-            $block_type->render_callback = [\NewsPlugin\Blocks\Renderers\LastUpdatedRenderer::class, 'render'];
-        }
-    }
 
     /**
      * Enqueue block assets
@@ -251,7 +98,7 @@ class BlockManager
      */
     public function getBlocks(): array
     {
-        return ['news-post-byline'];
+        return ['news/front-layout', 'news/article-hero-post-template'];
     }
 
     /**
@@ -277,14 +124,14 @@ class BlockManager
 
 
     /**
-     * Register news article post template block
+     * Register news article hero post template block
      */
     private function registerNewsArticlePostTemplateBlock(): void
     {
-        $block_json_path = plugin_dir_path(__FILE__) . '../../build/blocks/news-front-layout-template/block.json';
+        $block_json_path = plugin_dir_path(__FILE__) . '../../build/blocks/news-article-hero-post-template/block.json';
         
         if (!file_exists($block_json_path)) {
-            error_log('News Plugin: Article Post Template Block JSON file not found at: ' . $block_json_path);
+            error_log('News Plugin: Article Hero Post Template Block JSON file not found at: ' . $block_json_path);
             return;
         }
         
@@ -302,6 +149,7 @@ class BlockManager
      */
     public function getBlock(string $name): ?array
     {
-        return $name === 'news-post-byline' ? ['name' => 'news-post-byline'] : null;
+        $blocks = ['news/front-layout', 'news/article-hero-post-template'];
+        return in_array($name, $blocks) ? ['name' => $name] : null;
     }
 }

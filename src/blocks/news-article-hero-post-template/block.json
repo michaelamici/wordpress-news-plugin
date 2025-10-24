@@ -1,13 +1,13 @@
 {
   "$schema": "https://schemas.wp.org/trunk/block.json",
   "apiVersion": 3,
-  "name": "news/article-post-template",
+  "name": "news/article-hero-post-template",
   "version": "1.0.0",
-  "title": "News Article Post Template",
+  "title": "News Article Hero Post Template",
   "category": "news",
   "icon": "layout",
-  "description": "A post template for news articles that displays within the Front Layout block",
-  "keywords": ["news", "articles", "template", "post", "front"],
+  "description": "A customizable template for the hero article position in the Front Layout block",
+  "keywords": ["news", "articles", "template", "post", "hero", "front"],
   "textdomain": "news",
   "editorScript": "file:./index.js",
   "style": "file:./style.css",
@@ -51,13 +51,10 @@
         "core/post-featured-image", 
         "core/post-excerpt",
         "core/read-more",
-        "news/post-featured",
-        "news/post-byline",
-        "news/post-last-updated",
-        "news/post-breaking",
-        "news/post-exclusive",
-        "news/post-sponsored",
-        "news/post-live"
+        "core/post-content",
+        "core/post-date",
+        "core/post-author",
+        "core/post-terms"
       ]
     }
   }
