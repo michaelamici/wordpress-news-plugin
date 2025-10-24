@@ -1,0 +1,92 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "news/article-byline",
+  "version": "1.0.0",
+  "title": "News Article Byline",
+  "category": "news",
+  "icon": "admin-users",
+  "description": "Display the byline of a news article. Shows the article byline from post meta with formatting options.",
+  "keywords": ["news", "byline", "article", "author"],
+  "textdomain": "news",
+  "editorScript": "file:./index.js",
+  "style": "file:./style.css",
+  "render": "file:./render.php",
+  "attributes": {
+    "textAlign": {
+      "type": "string"
+    },
+    "avatarSize": {
+      "type": "number",
+      "default": 48
+    },
+    "showAvatar": {
+      "type": "boolean",
+      "default": false
+    },
+    "showBio": {
+      "type": "boolean",
+      "default": false
+    },
+    "byline": {
+      "type": "string"
+    },
+    "isLink": {
+      "type": "boolean",
+      "default": false
+    },
+    "linkTarget": {
+      "type": "string",
+      "default": "_self"
+    }
+  },
+  "usesContext": ["postId", "postType", "queryId"],
+  "supports": {
+    "html": false,
+    "color": {
+      "gradients": true,
+      "link": true,
+      "__experimentalDefaultControls": {
+        "background": true,
+        "text": true
+      }
+    },
+    "spacing": {
+      "margin": true,
+      "padding": true
+    },
+    "typography": {
+      "fontSize": true,
+      "lineHeight": true,
+      "__experimentalFontFamily": true,
+      "__experimentalFontWeight": true,
+      "__experimentalFontStyle": true,
+      "__experimentalTextTransform": true,
+      "__experimentalTextDecoration": true,
+      "__experimentalLetterSpacing": true,
+      "__experimentalDefaultControls": {
+        "fontSize": true
+      }
+    },
+    "__experimentalBorder": {
+      "radius": true,
+      "color": true,
+      "width": true,
+      "style": true,
+      "__experimentalDefaultControls": {
+        "radius": true,
+        "color": true,
+        "width": true,
+        "style": true
+      }
+    },
+    "filter": {
+      "duotone": true
+    },
+    "__experimentalSelector": ".wp-block-news-article-byline"
+  },
+  "ancestor": [
+    "news/article-hero-post-template",
+    "news/article-list-post-template"
+  ]
+}

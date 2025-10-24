@@ -21,16 +21,6 @@ function Edit({ context, clientId, attributes, setAttributes }) {
     const postType = context?.postType || context?.['news/postType'] || attributes?.postType || 'news';
     const position = context?.['news/position'] || attributes?.position || 'hero';
     
-    // Sync context to attributes so providesContext can pass them to children
-    // This is critical for WordPress core blocks to receive the context
-    if (postId && (attributes.postId !== postId || attributes.postType !== postType)) {
-        setAttributes({
-            postId: postId,
-            postType: postType,
-            position: position
-        });
-    }
-    
     // Fetch the post data for preview
     const { record: post, hasResolved } = useEntityRecord('postType', postType, postId);
     
@@ -88,6 +78,7 @@ function Edit({ context, clientId, attributes, setAttributes }) {
                 allowedBlocks={[
                     'core/group',
                     'core/post-title',
+                    'news/article-title',
                     'core/post-featured-image',
                     'core/post-excerpt',
                     'core/read-more',

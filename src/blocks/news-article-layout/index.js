@@ -1,5 +1,5 @@
 import { registerBlockType } from '@wordpress/blocks';
-import { useBlockProps, InnerBlocks, InspectorControls } from '@wordpress/block-editor';
+import { useBlockProps, InnerBlocks, InspectorControls, BlockContextProvider } from '@wordpress/block-editor';
 import { useEntityRecords } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
@@ -46,7 +46,16 @@ function Edit({ attributes, setAttributes, clientId }) {
         return innerBlocks.find(block => block.name === 'news/article-hero-post-template');
     }, [clientId]);
 
+    // Get the template block for the list position
+    const listTemplateBlock = useSelect((select) => {
+        if (!clientId) return null;
+        const { getBlocks } = select('core/block-editor');
+        const innerBlocks = getBlocks(clientId);
+        return innerBlocks.find(block => block.name === 'news/article-list-post-template');
+    }, [clientId]);
+
     const hasHeroTemplate = !!heroTemplateBlock;
+    const hasListTemplate = !!listTemplateBlock;
 
     const renderListPreview = () => {
         if (!hasResolved) {
@@ -62,6 +71,7 @@ function Edit({ attributes, setAttributes, clientId }) {
             return null;
         }
 
+        // Show simple preview for list posts
         return (
             <div className="news-front-layout__list">
                 <div className="news-list">
@@ -118,20 +128,17 @@ function Edit({ attributes, setAttributes, clientId }) {
             
             <div {...blockProps}>
                 <div className="news-front-layout">
-                    {/* Hero Template - InnerBlocks serves as both editor and preview */}
-                    <div className="news-front-layout__hero">
-                        <InnerBlocks 
-                            allowedBlocks={['news/article-hero-post-template']}
-                            template={[
-                                ['news/article-hero-post-template', {}]
-                            ]}
-                            templateLock={false}
-                            renderAppender={InnerBlocks.ButtonBlockAppender}
-                        />
-                    </div>
+                    <InnerBlocks 
+                        allowedBlocks={['news/article-hero-post-template', 'news/article-list-post-template']}
+                        template={[
+                            ['news/article-hero-post-template', {}],
+                            ['news/article-list-post-template', {}]
+                        ]}
+                        templateLock={false}
+                        renderAppender={InnerBlocks.ButtonBlockAppender}
+                    />
                     
-                    {/* List Articles Preview */}
-                    {renderListPreview()}
+                    {/* List Articles Preview - handled by InnerBlocks */}
                 </div>
             </div>
         </>

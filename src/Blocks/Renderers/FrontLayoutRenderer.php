@@ -46,7 +46,7 @@ class FrontLayoutRenderer
 
         // Render sections
         $output .= self::renderHeroSection($hero_post, $block);
-        $output .= self::renderListSection($list_posts);
+        $output .= self::renderListSection($list_posts, $block);
 
         $output .= '</div>';
 
@@ -144,22 +144,65 @@ class FrontLayoutRenderer
      * Render list section
      * 
      * @param array $list_posts Array of post objects
+     * @param \WP_Block $block Block object
      * @return string Rendered HTML
      */
-    private static function renderListSection(array $list_posts): string
+    private static function renderListSection(array $list_posts, \WP_Block $block): string
     {
         if (empty($list_posts)) {
             return '';
         }
 
         $output = '<div class="news-front-layout__list">';
-        $output .= '<div class="news-list">';
         
-        foreach ($list_posts as $post) {
-            $output .= self::renderListItem($post);
+        // Check for custom list template
+        $list_template_block = self::getCustomListTemplate($block);
+        if ($list_template_block) {
+            $output .= '<div class="news-list">';
+            
+            foreach ($list_posts as $post) {
+                // Clone the template block for each post
+                $template_clone = clone $list_template_block;
+                
+                // Set up global post data for template functions
+                global $wp_query;
+                $original_post = $wp_query->post ?? null;
+                $wp_query->post = $post;
+                setup_postdata($post);
+                
+                // Set the context AND attributes on the template block
+                $template_clone->context['news/postId'] = $post->ID;
+                $template_clone->context['news/postType'] = 'news';
+                $template_clone->context['news/position'] = 'list';
+                
+                // Also set attributes so they can be provided as context to children
+                $template_clone->attributes['postId'] = $post->ID;
+                $template_clone->attributes['postType'] = 'news';
+                $template_clone->attributes['position'] = 'list';
+                
+                // Render the template block with proper context
+                $template_output = $template_clone->render();
+                $output .= $template_output;
+                
+                // Restore original post data
+                if ($original_post) {
+                    $wp_query->post = $original_post;
+                    setup_postdata($original_post);
+                }
+            }
+            
+            $output .= '</div>';
+        } else {
+            // Use default list rendering
+            $output .= '<div class="news-list">';
+            
+            foreach ($list_posts as $post) {
+                $output .= self::renderListItem($post);
+            }
+            
+            $output .= '</div>';
         }
         
-        $output .= '</div>';
         $output .= '</div>';
         return $output;
     }
@@ -178,6 +221,27 @@ class FrontLayoutRenderer
 
         foreach ($block->inner_blocks as $inner_block) {
             if ($inner_block->name === 'news/article-hero-post-template') {
+                return $inner_block;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get custom list template block if it exists
+     * 
+     * @param \WP_Block $block Block object
+     * @return \WP_Block|null Template block or null
+     */
+    private static function getCustomListTemplate(\WP_Block $block): ?\WP_Block
+    {
+        if (empty($block->inner_blocks)) {
+            return null;
+        }
+
+        foreach ($block->inner_blocks as $inner_block) {
+            if ($inner_block->name === 'news/article-list-post-template') {
                 return $inner_block;
             }
         }

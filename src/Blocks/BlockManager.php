@@ -58,6 +58,9 @@ class BlockManager
     {
         $this->registerNewsArticleLayoutBlock();
         $this->registerNewsArticlePostTemplateBlock();
+        $this->registerNewsArticleListPostTemplateBlock();
+        $this->registerNewsArticleTitleBlock();
+        $this->registerNewsArticleBylineBlock();
     }
 
 
@@ -98,7 +101,7 @@ class BlockManager
      */
     public function getBlocks(): array
     {
-        return ['news/front-layout', 'news/article-hero-post-template'];
+        return ['news/front-layout', 'news/article-hero-post-template', 'news/article-list-post-template', 'news/article-title', 'news/article-byline'];
     }
 
     /**
@@ -145,11 +148,70 @@ class BlockManager
     }
 
     /**
+     * Register news article list post template block
+     */
+    private function registerNewsArticleListPostTemplateBlock(): void
+    {
+        $block_json_path = plugin_dir_path(__FILE__) . '../../build/blocks/news-article-list-post-template/block.json';
+        
+        if (!file_exists($block_json_path)) {
+            error_log('News Plugin: Article List Post Template Block JSON file not found at: ' . $block_json_path);
+            return;
+        }
+        
+        // Register block using block.json for editor support
+        $block_type = register_block_type($block_json_path);
+        
+        // Override the render callback to use our clean renderer
+        if ($block_type) {
+            $block_type->render_callback = [\NewsPlugin\Blocks\Renderers\ArticleTemplateRenderer::class, 'render'];
+        }
+    }
+
+    /**
+     * Register news article title block
+     */
+    private function registerNewsArticleTitleBlock(): void
+    {
+        $block_json_path = plugin_dir_path(__FILE__) . '../../build/blocks/news-article-title/block.json';
+        
+        if (!file_exists($block_json_path)) {
+            error_log('News Plugin: Article Title Block JSON file not found at: ' . $block_json_path);
+            return;
+        }
+        
+        // Register block using block.json for editor support
+        $block_type = register_block_type($block_json_path);
+        
+        // This block uses server-side rendering via render.php
+        // No custom render callback needed
+    }
+
+    /**
+     * Register news article byline block
+     */
+    private function registerNewsArticleBylineBlock(): void
+    {
+        $block_json_path = plugin_dir_path(__FILE__) . '../../build/blocks/news-article-byline/block.json';
+        
+        if (!file_exists($block_json_path)) {
+            error_log('News Plugin: Article Byline Block JSON file not found at: ' . $block_json_path);
+            return;
+        }
+        
+        // Register block using block.json for editor support
+        $block_type = register_block_type($block_json_path);
+        
+        // This block uses server-side rendering via render.php
+        // No custom render callback needed
+    }
+
+    /**
      * Get block by name
      */
     public function getBlock(string $name): ?array
     {
-        $blocks = ['news/front-layout', 'news/article-hero-post-template'];
+        $blocks = ['news/front-layout', 'news/article-hero-post-template', 'news/article-list-post-template', 'news/article-title', 'news/article-byline'];
         return in_array($name, $blocks) ? ['name' => $name] : null;
     }
 }

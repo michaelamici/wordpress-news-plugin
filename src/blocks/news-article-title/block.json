@@ -1,0 +1,69 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "news/article-title",
+  "version": "1.0.0",
+  "title": "News Article Title",
+  "category": "news",
+  "icon": "text",
+  "description": "Display the title of a news article. Similar to the core Post Title block but specifically for news articles.",
+  "keywords": ["news", "title", "article", "heading"],
+  "textdomain": "news",
+  "editorScript": "file:./index.js",
+  "style": "file:./style.css",
+  "render": "file:./render.php",
+  "attributes": {
+    "level": {
+      "type": "number",
+      "default": 2
+    },
+    "textAlign": {
+      "type": "string"
+    },
+    "isLink": {
+      "type": "boolean",
+      "default": true
+    },
+    "linkTarget": {
+      "type": "string",
+      "default": "_self"
+    },
+    "rel": {
+      "type": "string"
+    }
+  },
+  "usesContext": ["postId", "postType", "queryId"],
+  "supports": {
+    "html": false,
+    "color": {
+      "gradients": true,
+      "link": true,
+      "__experimentalDefaultControls": {
+        "background": true,
+        "text": true
+      }
+    },
+    "spacing": {
+      "margin": true,
+      "padding": true
+    },
+    "typography": {
+      "fontSize": true,
+      "lineHeight": true,
+      "__experimentalFontFamily": true,
+      "__experimentalFontWeight": true,
+      "__experimentalFontStyle": true,
+      "__experimentalTextTransform": true,
+      "__experimentalTextDecoration": true,
+      "__experimentalLetterSpacing": true,
+      "__experimentalDefaultControls": {
+        "fontSize": true
+      }
+    },
+    "__experimentalSelector": ".wp-block-news-article-title a"
+  },
+  "ancestor": [
+    "news/article-hero-post-template",
+    "news/article-list-post-template"
+  ]
+}
