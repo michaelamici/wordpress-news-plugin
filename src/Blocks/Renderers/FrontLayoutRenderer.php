@@ -106,12 +106,6 @@ class FrontLayoutRenderer
         // Check for custom template
         $template_block = self::getCustomTemplate($block);
         if ($template_block) {
-            // Set up global post data for template functions
-            global $wp_query;
-            $original_post = $wp_query->post ?? null;
-            $wp_query->post = $hero_post;
-            setup_postdata($hero_post);
-            
             // Set the context AND attributes on the template block
             $template_block->context['news/postId'] = $hero_post->ID;
             $template_block->context['news/postType'] = 'news';
@@ -125,12 +119,6 @@ class FrontLayoutRenderer
             // Render the template block with proper context
             $template_output = $template_block->render();
             $output .= $template_output;
-            
-            // Restore original post data
-            if ($original_post) {
-                $wp_query->post = $original_post;
-                setup_postdata($original_post);
-            }
         } else {
             $output .= self::renderDefaultHero($hero_post);
         }
@@ -164,12 +152,6 @@ class FrontLayoutRenderer
                 // Clone the template block for each post
                 $template_clone = clone $list_template_block;
                 
-                // Set up global post data for template functions
-                global $wp_query;
-                $original_post = $wp_query->post ?? null;
-                $wp_query->post = $post;
-                setup_postdata($post);
-                
                 // Set the context AND attributes on the template block
                 $template_clone->context['news/postId'] = $post->ID;
                 $template_clone->context['news/postType'] = 'news';
@@ -183,12 +165,6 @@ class FrontLayoutRenderer
                 // Render the template block with proper context
                 $template_output = $template_clone->render();
                 $output .= $template_output;
-                
-                // Restore original post data
-                if ($original_post) {
-                    $wp_query->post = $original_post;
-                    setup_postdata($original_post);
-                }
             }
             
             $output .= '</div>';
@@ -317,4 +293,5 @@ class FrontLayoutRenderer
         
         return $output;
     }
+
 }
