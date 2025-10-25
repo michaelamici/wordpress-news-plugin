@@ -285,14 +285,26 @@ class Admin
      */
     public function addMetaBoxes(): void
     {
-        add_meta_box(
-            'news_article_meta',
-            __('Article Settings', 'news'),
-            [$this, 'renderArticleMetaBox'],
-            'news',
-            'normal',
-            'high'
-        );
+        // Respect enable_blocks setting: if blocks enabled, default-hide legacy meta box
+        $settings = get_option('news_settings', []);
+        $enable_blocks = $settings['enable_blocks'] ?? true;
+
+        /**
+         * Filter: news_show_legacy_article_meta_box
+         * Allows themes/plugins to force-show the PHP meta box even when blocks are enabled.
+         */
+        $show_legacy = apply_filters('news_show_legacy_article_meta_box', !$enable_blocks ? true : false);
+
+        if ($show_legacy) {
+            add_meta_box(
+                'news_article_meta',
+                __('Article Settings', 'news'),
+                [$this, 'renderArticleMetaBox'],
+                'news',
+                'normal',
+                'high'
+            );
+        }
     }
 
     /**

@@ -29,13 +29,8 @@ $popular_articles = get_posts([
     'post_status' => 'publish',
     'orderby' => 'comment_count',
     'order' => 'DESC',
-    'meta_query' => [
-        [
-            'key' => '_news_article_meta',
-            'value' => 'featured',
-            'compare' => 'LIKE'
-        ]
-    ]
+    'meta_key' => '_news_featured',
+    'meta_value' => '1',
 ]);
 
 // Get section statistics

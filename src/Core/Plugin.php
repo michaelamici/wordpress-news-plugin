@@ -61,16 +61,16 @@ final class Plugin
     /**
      * Component managers
      */
-    private Admin $admin;
-    private Frontend $frontend;
-    private BlockManager $blockManager;
-    private WidgetManager $widgetManager;
-    private RestApi $restApi;
-    private SecurityManager $securityManager;
-    private DatabaseManager $databaseManager;
-    private AssetManager $assetManager;
-    private HookManager $hookManager;
-    private PostTypes $postTypes;
+    private ?Admin $admin = null;
+    private ?Frontend $frontend = null;
+    private ?BlockManager $blockManager = null;
+    private ?WidgetManager $widgetManager = null;
+    private ?RestApi $restApi = null;
+    private ?SecurityManager $securityManager = null;
+    private ?DatabaseManager $databaseManager = null;
+    private ?AssetManager $assetManager = null;
+    private ?HookManager $hookManager = null;
+    private ?PostTypes $postTypes = null;
 
     /**
      * Initialization flag
@@ -151,7 +151,7 @@ final class Plugin
      */
     public function initComponentsPublic(): void
     {
-        $this->initComponents();
+        // Components already initialized in init(), no need to re-initialize
     }
 
     /**
@@ -269,8 +269,8 @@ final class Plugin
         // Flush rewrite rules
         flush_rewrite_rules();
 
-        // Clear caches
-        $this->cacheManager->flush();
+        // Clear WordPress caches
+        wp_cache_flush();
 
         // Fire deactivation hook
         do_action('news_plugin_deactivate');
@@ -459,27 +459,42 @@ final class Plugin
 
     public function getSecurityManager(): SecurityManager
     {
+        if ($this->securityManager === null) {
+            $this->securityManager = new SecurityManager();
+        }
         return $this->securityManager;
     }
 
 
     public function getDatabaseManager(): DatabaseManager
     {
+        if ($this->databaseManager === null) {
+            $this->databaseManager = new DatabaseManager();
+        }
         return $this->databaseManager;
     }
 
     public function getAssetManager(): AssetManager
     {
+        if ($this->assetManager === null) {
+            $this->assetManager = new AssetManager();
+        }
         return $this->assetManager;
     }
 
     public function getHookManager(): HookManager
     {
+        if ($this->hookManager === null) {
+            $this->hookManager = new HookManager();
+        }
         return $this->hookManager;
     }
 
     public function getPostTypes(): PostTypes
     {
+        if ($this->postTypes === null) {
+            $this->postTypes = new PostTypes();
+        }
         return $this->postTypes;
     }
 

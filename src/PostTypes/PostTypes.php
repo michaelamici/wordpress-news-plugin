@@ -314,6 +314,15 @@ class PostTypes
                     'description' => 'Last updated date',
                     'single' => true,
                     'show_in_rest' => true,
+                    'sanitize_callback' => function($value) {
+                        // Accept empty or ISO-like strings
+                        $value = is_string($value) ? trim($value) : '';
+                        if ($value === '') {
+                            return '';
+                        }
+                        // Basic validation; if strtotime fails, drop value
+                        return strtotime($value) ? $value : '';
+                    },
                 ]);
                 
 

@@ -47,11 +47,10 @@ $articles = get_posts([
                         <?php
                         $sections = get_the_terms($article->ID, 'news_section');
                         $section_name = !empty($sections) ? $sections[0]->name : __('No Section', 'news');
-                        $meta = get_post_meta($article->ID, '_news_article_meta', true);
                         $flags = [];
-                        if (!empty($meta['featured'])) $flags[] = __('Featured', 'news');
-                        if (!empty($meta['breaking'])) $flags[] = __('Breaking', 'news');
-                        if (!empty($meta['exclusive'])) $flags[] = __('Exclusive', 'news');
+                        if (get_post_meta($article->ID, '_news_featured', true)) $flags[] = __('Featured', 'news');
+                        if (get_post_meta($article->ID, '_news_breaking', true)) $flags[] = __('Breaking', 'news');
+                        if (get_post_meta($article->ID, '_news_exclusive', true)) $flags[] = __('Exclusive', 'news');
                         ?>
                         <tr>
                             <td>

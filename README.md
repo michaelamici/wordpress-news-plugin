@@ -4,8 +4,8 @@
 Transform WordPress into a modern, online-only newspaper platform for the New Baltimore Gazette. This plugin adds core newsroom concepts (Sections, Fronts, Articles, Placements, Breaking Alerts) with a Gutenberg-first editorial experience.
 
 ## 🚀 Status
-**v1.0.0 - Production Ready!** 🎉  
-*Simplified, consolidated architecture*
+**v1.1.0 - Gutenberg-first Article Settings** 🎉  
+*Article Settings now live in a Gutenberg sidebar; legacy PHP meta box is hidden by default and can be re-enabled via `news_show_legacy_article_meta_box` filter or disabling `Enable Blocks` setting.*
 
 ## ✨ Core Features
 - **News Management**: Custom post type `news` with editorial meta fields
@@ -33,7 +33,7 @@ Transform WordPress into a modern, online-only newspaper platform for the New Ba
 
 ### WordPress Integration
 - **Content Types**: CPT `news`, Taxonomy `news_section`
-- **REST API**: Expose meta via `register_post_meta()` with `show_in_rest => true`
+- **REST API**: Expose meta via `register_post_meta()` with `show_in_rest => true`; REST now filters/returns individual meta keys (`_news_featured`, `_news_breaking`, etc.)
 - **Security**: Custom caps, nonces, sanitization, escaping
 - **Performance**: Transients/object cache, efficient queries
 - **Assets**: Conditional enqueue, minimal structural CSS
@@ -75,8 +75,16 @@ news/
 
 ## 🔧 Configuration
 
+### Article Settings (Gutenberg)
+- Open a `news` article in the block editor; use the “Article Settings” panel in the document sidebar.
+- Fields: Featured, Breaking, Exclusive, Sponsored, Live, Last Updated, Byline.
+- Toggle the legacy PHP meta box via:
+```php
+add_filter('news_show_legacy_article_meta_box', '__return_true');
+```
+
 ### Breaking Alerts
-Manage breaking news alerts through the admin interface or REST API.
+Manage breaking news alerts through the editor panel or REST API.
 
 ### Placements
 Register placement slots via filters and render with actions:

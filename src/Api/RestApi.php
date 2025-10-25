@@ -293,24 +293,23 @@ class RestApi
             ];
         }
 
+        $meta_query = [];
         if ($featured) {
-            $query_args['meta_query'] = [
-                [
-                    'key' => '_news_article_meta',
-                    'value' => 'featured',
-                    'compare' => 'LIKE',
-                ],
+            $meta_query[] = [
+                'key' => '_news_featured',
+                'value' => '1',
+                'compare' => '=',
             ];
         }
-
         if ($breaking) {
-            $query_args['meta_query'] = [
-                [
-                    'key' => '_news_article_meta',
-                    'value' => 'breaking',
-                    'compare' => 'LIKE',
-                ],
+            $meta_query[] = [
+                'key' => '_news_breaking',
+                'value' => '1',
+                'compare' => '=',
             ];
+        }
+        if (!empty($meta_query)) {
+            $query_args['meta_query'] = $meta_query;
         }
 
         $query = new \WP_Query($query_args);
@@ -567,7 +566,11 @@ class RestApi
      */
     private function formatArticle($post): array
     {
-        $meta = get_post_meta($post->ID, '_news_article_meta', true);
+        // Migrate to individual meta keys; legacy aggregate removed
+        $featured = (bool) get_post_meta($post->ID, '_news_featured', true);
+        $breaking = (bool) get_post_meta($post->ID, '_news_breaking', true);
+        $exclusive = (bool) get_post_meta($post->ID, '_news_exclusive', true);
+        $sponsored = (bool) get_post_meta($post->ID, '_news_sponsored', true);
         $sections = wp_get_post_terms($post->ID, 'news_section');
         $featured_image = null;
 
@@ -597,10 +600,12 @@ class RestApi
             ],
             'sections' => array_map([$this, 'formatSection'], $sections),
             'meta' => [
-                'featured' => !empty($meta['featured']),
-                'breaking' => !empty($meta['breaking']),
-                'exclusive' => !empty($meta['exclusive']),
-                'sponsored' => !empty($meta['sponsored']),
+                'featured' => $featured,
+                'breaking' => $breaking,
+                'exclusive' => $exclusive,
+                'sponsored' => $sponsored,
+                'byline' => (string) get_post_meta($post->ID, '_news_byline', true),
+                'last_updated' => (string) get_post_meta($post->ID, '_news_last_updated', true),
             ],
             'date' => [
                 'published' => get_the_date('c', $post->ID),

@@ -47,6 +47,7 @@ class AssetManager
         add_action('wp_enqueue_scripts', [$this, 'enqueueFrontendAssets']);
         add_action('admin_enqueue_scripts', [$this, 'enqueueAdminAssets']);
         add_action('enqueue_block_editor_assets', [$this, 'enqueueBlockAssets']);
+        add_action('enqueue_block_editor_assets', [$this, 'enqueueEditorArticleSettings']);
     }
 
     /**
@@ -137,6 +138,65 @@ class AssetManager
             'news-blocks',
             'js/blocks.js',
             ['wp-blocks', 'wp-element', 'wp-editor'],
+            true
+        );
+    }
+
+    /**
+     * Enqueue Gutenberg editor Article Settings panel (news CPT only)
+     */
+    public function enqueueEditorArticleSettings(): void
+    {
+        $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+        $post_type = function_exists('get_post_type') ? get_post_type() : null;
+
+        // Only load in block editor for news post type
+        // Fallback checks since enqueue_block_editor_assets doesn't always have screen
+        $is_news = false;
+        if ($post_type === 'news') {
+            $is_news = true;
+        } elseif ($screen && !empty($screen->post_type) && $screen->post_type === 'news') {
+            $is_news = true;
+        } else {
+            // Try to infer from global $post
+            global $post;
+            if ($post && isset($post->post_type) && $post->post_type === 'news') {
+                $is_news = true;
+            }
+        }
+
+        if (!$is_news) {
+            return;
+        }
+
+        // Allow site to disable via existing setting
+        $settings = get_option('news_settings', []);
+        if (isset($settings['enable_blocks']) && !$settings['enable_blocks']) {
+            return;
+        }
+
+        // Styles
+        $this->enqueueStyle(
+            'news-editor-article-settings',
+            'css/editor-article-settings.css',
+            ['wp-edit-post']
+        );
+
+        // Script
+        $deps = [
+            'wp-plugins',
+            'wp-edit-post',
+            'wp-components',
+            'wp-data',
+            'wp-core-data',
+            'wp-element',
+            'wp-i18n',
+            'wp-editor'
+        ];
+        $this->enqueueScript(
+            'news-editor-article-settings',
+            'js/editor-article-settings.js',
+            $deps,
             true
         );
     }

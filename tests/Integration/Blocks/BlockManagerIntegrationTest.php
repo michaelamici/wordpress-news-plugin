@@ -124,7 +124,7 @@ class BlockManagerIntegrationTest extends WP_UnitTestCase
             'post_title' => 'Breaking News Test',
         ]);
 
-        update_post_meta($post_id, '_news_article_meta', 'breaking');
+        update_post_meta($post_id, '_news_breaking', true);
 
         $attributes = [
             'count' => 1,

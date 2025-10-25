@@ -85,7 +85,8 @@ class Frontend
             return;
         }
 
-        $meta = get_post_meta($post->ID, '_news_article_meta', true);
+        $is_breaking = (bool) get_post_meta($post->ID, '_news_breaking', true);
+        $is_exclusive = (bool) get_post_meta($post->ID, '_news_exclusive', true);
         
         // Add Open Graph tags
         echo '<meta property="og:type" content="article" />' . "\n";
@@ -106,11 +107,11 @@ class Frontend
         echo '<meta name="twitter:description" content="' . esc_attr($post->post_excerpt) . '" />' . "\n";
         
         // Add article specific meta
-        if (!empty($meta['breaking'])) {
+        if ($is_breaking) {
             echo '<meta name="news:breaking" content="true" />' . "\n";
         }
         
-        if (!empty($meta['exclusive'])) {
+        if ($is_exclusive) {
             echo '<meta name="news:exclusive" content="true" />' . "\n";
         }
     }
@@ -173,9 +174,9 @@ class Frontend
     {
         global $post;
         
-        $meta = get_post_meta($post->ID, '_news_article_meta', true);
+        $is_breaking = (bool) get_post_meta($post->ID, '_news_breaking', true);
         
-        if (!empty($meta['breaking'])) {
+        if ($is_breaking) {
             echo '<div class="news-breaking-banner">';
             echo '<span class="news-breaking-label">' . esc_html__('BREAKING', 'news') . '</span>';
             echo '<span class="news-breaking-text">' . esc_html($post->post_title) . '</span>';
@@ -258,23 +259,13 @@ class Frontend
         }
 
         if ($atts['featured']) {
-            $query_args['meta_query'] = [
-                [
-                    'key' => '_news_article_meta',
-                    'value' => 'featured',
-                    'compare' => 'LIKE',
-                ],
-            ];
+            $query_args['meta_key'] = '_news_featured';
+            $query_args['meta_value'] = '1';
         }
 
         if ($atts['breaking']) {
-            $query_args['meta_query'] = [
-                [
-                    'key' => '_news_article_meta',
-                    'value' => 'breaking',
-                    'compare' => 'LIKE',
-                ],
-            ];
+            $query_args['meta_key'] = '_news_breaking';
+            $query_args['meta_value'] = '1';
         }
 
         $query = new \WP_Query($query_args);
@@ -355,13 +346,8 @@ class Frontend
             'post_type' => 'news',
             'posts_per_page' => (int) $atts['count'],
             'post_status' => 'publish',
-            'meta_query' => [
-                [
-                    'key' => '_news_article_meta',
-                    'value' => 'breaking',
-                    'compare' => 'LIKE',
-                ],
-            ],
+            'meta_key' => '_news_breaking',
+            'meta_value' => '1',
         ]);
 
         if (!$query->have_posts()) {
@@ -425,7 +411,7 @@ class Frontend
             return [];
         }
 
-        $meta = get_post_meta($post->ID, '_news_article_meta', true);
+        $is_breaking = (bool) get_post_meta($post->ID, '_news_breaking', true);
         $sections = wp_get_post_terms($post->ID, 'news_section');
         
         $json_ld = [
@@ -463,7 +449,7 @@ class Frontend
             $json_ld['articleSection'] = wp_list_pluck($sections, 'name');
         }
 
-        if (!empty($meta['breaking'])) {
+        if ($is_breaking) {
             $json_ld['breakingNews'] = true;
         }
 
