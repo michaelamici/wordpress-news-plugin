@@ -116,9 +116,24 @@ class FrontLayoutRenderer
             $template_block->attributes['postType'] = 'news';
             $template_block->attributes['position'] = 'hero';
             
-            // Render the template block with proper context
-            $template_output = $template_block->render();
-            $output .= $template_output;
+            // Set up global post data for template functions
+            global $wp_query;
+            $original_post = $wp_query->post ?? null;
+            $wp_query->post = $hero_post;
+            setup_postdata($hero_post);
+            
+            // Render inner blocks using Gutenberg's default rendering
+            if (!empty($template_block->inner_blocks)) {
+                foreach ($template_block->inner_blocks as $inner_block) {
+                    $output .= $inner_block->render();
+                }
+            }
+            
+            // Restore original post data
+            if ($original_post) {
+                $wp_query->post = $original_post;
+                setup_postdata($original_post);
+            }
         } else {
             $output .= self::renderDefaultHero($hero_post);
         }
@@ -162,9 +177,24 @@ class FrontLayoutRenderer
                 $template_clone->attributes['postType'] = 'news';
                 $template_clone->attributes['position'] = 'list';
                 
-                // Render the template block with proper context
-                $template_output = $template_clone->render();
-                $output .= $template_output;
+                // Set up global post data for template functions
+                global $wp_query;
+                $original_post = $wp_query->post ?? null;
+                $wp_query->post = $post;
+                setup_postdata($post);
+                
+                // Render inner blocks using Gutenberg's default rendering
+                if (!empty($template_clone->inner_blocks)) {
+                    foreach ($template_clone->inner_blocks as $inner_block) {
+                        $output .= $inner_block->render();
+                    }
+                }
+                
+                // Restore original post data
+                if ($original_post) {
+                    $wp_query->post = $original_post;
+                    setup_postdata($original_post);
+                }
             }
             
             $output .= '</div>';
