@@ -118,10 +118,36 @@ export default function PostTemplateEdit( {
 } ) {
 	const { type: layoutType, columnCount = 3 } = layout || {};
 	const [ activeBlockContextId, setActiveBlockContextId ] = useState();
-	const { posts, blocks } = useSelect(
+	const { posts, blocks, calculatedOffset } = useSelect(
 		( select ) => {
 			const { getEntityRecords, getTaxonomies } = select( coreStore );
-			const { getBlocks } = select( blockEditorStore );
+			const { getBlocks, getBlockParents, getBlockIndex } = select( blockEditorStore );
+			
+			// Calculate offset based on position in parent juicy-headline-multi-query block
+			let calculatedOffset = offset || 0;
+			const parentClientIds = getBlockParents( clientId );
+			const parentId = parentClientIds?.find( ( parentId ) => {
+				const parentBlock = select( blockEditorStore ).getBlock( parentId );
+				return parentBlock?.name === 'kestrel-courier/juicy-headline-multi-query';
+			} );
+			
+			if ( parentId ) {
+				const parentBlocks = getBlocks( parentId );
+				const currentIndex = getBlockIndex( clientId, parentId );
+				if ( currentIndex !== null && currentIndex >= 0 ) {
+					// Calculate offset: sum of perPage from all previous blocks
+					let runningOffset = 0;
+					for ( let i = 0; i < currentIndex; i++ ) {
+						const prevBlock = parentBlocks[ i ];
+						if ( prevBlock?.name === 'kestrel-courier/featured-story-template' ) {
+							runningOffset += 1;
+						} else if ( prevBlock?.name === 'kestrel-courier/breaking-news-template' ) {
+							runningOffset += 2;
+						}
+					}
+					calculatedOffset = runningOffset;
+				}
+			}
 			const templateCategory =
 				inherit &&
 				templateSlug?.startsWith( 'category-' ) &&
@@ -141,7 +167,7 @@ export default function PostTemplateEdit( {
 					slug: templateSlug.replace( 'tag-', '' ),
 				} );
 			const query = {
-				offset: offset || 0,
+				offset: calculatedOffset,
 				order,
 				orderby: orderBy,
 			};
@@ -170,9 +196,8 @@ export default function PostTemplateEdit( {
 					Object.assign( query, builtTaxQuery );
 				}
 			}
-			if ( perPage ) {
-				query.per_page = perPage;
-			}
+			// Breaking news template always shows exactly 2 articles
+			query.per_page = 2;
 			if ( author ) {
 				query.author = author;
 			}
@@ -234,6 +259,7 @@ export default function PostTemplateEdit( {
 					...restQueryArgs,
 				} ),
 				blocks: getBlocks( clientId ),
+				calculatedOffset,
 			};
 		},
 		[

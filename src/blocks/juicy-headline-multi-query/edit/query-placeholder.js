@@ -6,7 +6,7 @@ import {
 	createBlocksFromInnerBlocksTemplate,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	__experimentalBlockVariationPicker,
@@ -24,6 +24,13 @@ import { useScopedBlockVariations } from '../utils';
 import { useBlockPatterns } from './pattern-selection';
 import QueryToolbar from './query-toolbar';
 
+// Template: Featured, Breaking, Saucy (in that order)
+const TEMPLATE = [
+	[ 'kestrel-courier/featured-story-template' ],
+	[ 'kestrel-courier/breaking-news-template' ],
+	[ 'kestrel-courier/saucy-story-template' ],
+];
+
 export default function QueryPlaceholder( {
 	attributes,
 	clientId,
@@ -32,6 +39,7 @@ export default function QueryPlaceholder( {
 } ) {
 	const [ isStartingBlank, setIsStartingBlank ] = useState( false );
 	const [ containerWidth, setContainerWidth ] = useState( 0 );
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 
 	// Use ResizeObserver to monitor container width.
 	const resizeObserverRef = useResizeObserver( ( [ entry ] ) => {
@@ -111,7 +119,11 @@ export default function QueryPlaceholder( {
 						__next40pxDefaultSize
 						variant="secondary"
 						onClick={ () => {
-							setIsStartingBlank( true );
+							replaceInnerBlocks(
+								clientId,
+								createBlocksFromInnerBlocksTemplate( TEMPLATE ),
+								false
+							);
 						} }
 					>
 						{ __( 'Start blank' ) }
@@ -123,26 +135,24 @@ export default function QueryPlaceholder( {
 }
 
 function QueryVariationPicker( { clientId, attributes, icon, label } ) {
-	const scopeVariations = useScopedBlockVariations( attributes );
 	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 	const blockProps = useBlockProps();
+	
+	// Always initialize with the three required blocks: Featured, Breaking, Saucy
+	useEffect( () => {
+		replaceInnerBlocks(
+			clientId,
+			createBlocksFromInnerBlocksTemplate( TEMPLATE ),
+			false
+		);
+	}, [ clientId, replaceInnerBlocks ] );
+	
 	return (
 		<div { ...blockProps }>
-			<__experimentalBlockVariationPicker
+			<Placeholder
 				icon={ icon }
 				label={ label }
-				variations={ scopeVariations }
-				onSelect={ ( variation ) => {
-					if ( variation.innerBlocks ) {
-						replaceInnerBlocks(
-							clientId,
-							createBlocksFromInnerBlocksTemplate(
-								variation.innerBlocks
-							),
-							false
-						);
-					}
-				} }
+				instructions={ __( 'Initializing with Featured, Breaking, and Saucy templates...' ) }
 			/>
 		</div>
 	);

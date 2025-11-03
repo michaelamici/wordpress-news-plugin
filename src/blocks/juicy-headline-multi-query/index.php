@@ -120,13 +120,13 @@ function render_block_kestrel_courier_juicy_headline_multi_query( $attributes, $
 					'perPage' => 1,
 				);
 				$current_offset += 1;
-			} elseif ( 'kestrel-courier/breaking-news-template' === $template_name ) {
-				$template_configs[] = array(
-					'name' => $template_name,
-					'offset' => $current_offset,
-					'perPage' => 1,
-				);
-				$current_offset += 1;
+		} elseif ( 'kestrel-courier/breaking-news-template' === $template_name ) {
+			$template_configs[] = array(
+				'name' => $template_name,
+				'offset' => $current_offset,
+				'perPage' => 2,
+			);
+			$current_offset += 2;
 			} elseif ( 'kestrel-courier/saucy-story-template' === $template_name ) {
 				$template_configs[] = array(
 					'name' => $template_name,
