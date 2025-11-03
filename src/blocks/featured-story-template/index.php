@@ -68,19 +68,27 @@ function render_block_kestrel_courier_featured_story_template( $attributes, $con
 			$query = $wp_query;
 		}
 	} else {
-		$query_args = build_query_vars_from_query_block( $block, $page );
+		// Check for offset and perPage in context (set by parent query block for sequential rendering)
+		// If present, use page=1 to avoid pagination offset interfering with manual offset
+		$has_manual_offset = isset( $block->context['query']['offset'] );
+		$use_page = $has_manual_offset ? 1 : $page;
+		$query_args = build_query_vars_from_query_block( $block, $use_page );
 		
-		// Check for offset and posts_per_page in context (set by parent query block for sequential rendering)
-		if ( isset( $block->context['query']['offset'] ) ) {
+		// Override with manual offset/perPage if set in context
+		if ( $has_manual_offset ) {
 			$query_args['offset'] = (int) $block->context['query']['offset'];
+			// Unset paged to prevent double offset calculation
+			if ( isset( $query_args['paged'] ) ) {
+				unset( $query_args['paged'] );
+			}
 		}
-		if ( isset( $block->context['query']['posts_per_page'] ) ) {
-			$posts_per_page = (int) $block->context['query']['posts_per_page'];
+		if ( isset( $block->context['query']['perPage'] ) ) {
+			$per_page = (int) $block->context['query']['perPage'];
 			// -1 means unlimited, but WP_Query uses -1 differently, so we use a large number
-			if ( -1 === $posts_per_page ) {
+			if ( -1 === $per_page ) {
 				$query_args['posts_per_page'] = 999; // Large number to get all remaining posts
 			} else {
-				$query_args['posts_per_page'] = $posts_per_page;
+				$query_args['posts_per_page'] = $per_page;
 			}
 		}
 		

@@ -114,9 +114,9 @@ function render_block_kestrel_courier_juicy_headline_multi_query( $attributes, $
 				$query_context = array_merge( $attributes['query'], $query_context );
 			}
 			
-			// Add offset and posts_per_page to query context
+			// Add offset and perPage to query context (perPage is the WordPress convention)
 			$query_context['offset'] = $config['offset'];
-			$query_context['posts_per_page'] = $config['posts_per_page'];
+			$query_context['perPage'] = $config['posts_per_page'];
 			
 			$modified_context['query'] = $query_context;
 			
