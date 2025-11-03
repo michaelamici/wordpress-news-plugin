@@ -149,12 +149,12 @@ function render_block_kestrel_courier_breaking_news_template( $attributes, $cont
 		$block_content = ( new WP_Block( $block_instance ) )->render( array( 'dynamic' => false ) );
 		remove_filter( 'render_block_context', $filter_block_context, 1 );
 
-		// Wrap the render inner blocks in a `div` element (column) with the appropriate post classes.
-		$post_classes = implode( ' ', get_post_class( 'wp-block-post wp-block-column' ) );
+		// Wrap the render inner blocks in a `div` element with the appropriate post classes.
+		$post_classes = implode( ' ', get_post_class( 'wp-block-post' ) );
 
 		$inner_block_directives = $enhanced_pagination ? ' data-wp-key="post-template-item-' . $post_id . '"' : '';
 
-		$content .= '<div' . $inner_block_directives . ' class="' . esc_attr( $post_classes ) . '">' . $block_content . '</div>';
+		$content .= '<div' . $inner_block_directives . ' class="' . esc_attr( $post_classes ) . '" style="align-self: start; margin-top: 0;">' . $block_content . '</div>';
 	}
 
 	/*

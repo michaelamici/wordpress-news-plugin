@@ -342,18 +342,17 @@ export default function PostTemplateEdit( {
 				<ToolbarGroup controls={ displayLayoutControls } />
 			</BlockControls>
 
-			<div 
-				{ ...blockProps }
-				className={ clsx( blockProps.className, 'wp-block-columns has-2-columns' ) }
-				style={ { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1em' } }
-			>
+			<div { ...blockProps }>
 				{ blockContexts &&
 					blockContexts.map( ( blockContext, index ) => (
 						<BlockContextProvider
 							key={ blockContext.postId }
 							value={ blockContext }
 						>
-							<div className="wp-block-column">
+							<div 
+								className="wp-block-post"
+								style={ { alignSelf: 'start', marginTop: 0 } }
+							>
 								{ blockContext.postId ===
 								( activeBlockContextId ||
 									blockContexts[ 0 ]?.postId ) ? (
