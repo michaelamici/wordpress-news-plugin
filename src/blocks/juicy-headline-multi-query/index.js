@@ -75,3 +75,6 @@ export const settings = {
 };
 
 export const init = () => initBlock( { name, metadata, settings } );
+
+// Automatically register the block when this module is loaded
+init();

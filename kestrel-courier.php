@@ -16,9 +16,9 @@ if (!defined('ABSPATH')) {
 }
 
 // Register blocks
-require_once plugin_dir_path(__FILE__) . 'src/blocks/query/index.php';
-require_once plugin_dir_path(__FILE__) . 'src/blocks/post-template/index.php';
-require_once plugin_dir_path(__FILE__) . 'src/blocks/post-template-breaking/index.php';
-require_once plugin_dir_path(__FILE__) . 'src/blocks/post-template-featured/index.php';
+require_once plugin_dir_path(__FILE__) . 'src/blocks/juicy-headline-multi-query/index.php';
+require_once plugin_dir_path(__FILE__) . 'src/blocks/saucy-story-template/index.php';
+require_once plugin_dir_path(__FILE__) . 'src/blocks/breaking-news-template/index.php';
+require_once plugin_dir_path(__FILE__) . 'src/blocks/featured-story-template/index.php';
 
 // Plugin initialized.

@@ -3,7 +3,7 @@
 	"apiVersion": 3,
 	"name": "kestrel-courier/juicy-headline-multi-query",
 	"title": "Juicy Headline Multi-Query",
-	"category": "theme",
+	"category": "widgets",
 	"description": "An advanced block that allows displaying post types based on different query parameters and visual configurations.",
 	"keywords": [ "posts", "list", "blog", "blogs", "custom post types" ],
 	"textdomain": "default",

@@ -1,6 +1,6 @@
 <?php
 /**
- * Server-side rendering of the `kestrel-courier/saucy-story-template` block.
+ * Server-side rendering of the `kestrel-courier/featured-story-template` block.
  *
  * @package WordPress
  */
@@ -14,7 +14,7 @@
  *
  * @return bool Whether the block list contains a block that uses the featured image.
  */
-function block_core_post_template_uses_featured_image( $inner_blocks ) {
+function kestrel_courier_block_core_featured_story_template_uses_featured_image( $inner_blocks ) {
 	foreach ( $inner_blocks as $block ) {
 		if ( 'core/post-featured-image' === $block->name ) {
 			return true;
@@ -25,7 +25,7 @@ function block_core_post_template_uses_featured_image( $inner_blocks ) {
 		) {
 			return true;
 		}
-		if ( $block->inner_blocks && block_core_post_template_uses_featured_image( $block->inner_blocks ) ) {
+		if ( $block->inner_blocks && kestrel_courier_block_core_featured_story_template_uses_featured_image( $block->inner_blocks ) ) {
 			return true;
 		}
 	}
@@ -34,7 +34,7 @@ function block_core_post_template_uses_featured_image( $inner_blocks ) {
 }
 
 /**
- * Renders the `kestrel-courier/saucy-story-template` block on the server.
+ * Renders the `kestrel-courier/featured-story-template` block on the server.
  *
  * @since 6.3.0 Changed render_block_context priority to `1`.
  *
@@ -46,7 +46,7 @@ function block_core_post_template_uses_featured_image( $inner_blocks ) {
  *
  * @return string Returns the output of the query, structured using the layout defined by the block's inner blocks.
  */
-function render_block_kestrel_courier_saucy_story_template( $attributes, $content, $block ) {
+function render_block_kestrel_courier_featured_story_template( $attributes, $content, $block ) {
 	$page_key            = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
 	$enhanced_pagination = isset( $block->context['enhancedPagination'] ) && $block->context['enhancedPagination'];
 	$page                = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
@@ -76,7 +76,7 @@ function render_block_kestrel_courier_saucy_story_template( $attributes, $conten
 		return '';
 	}
 
-	if ( block_core_post_template_uses_featured_image( $block->inner_blocks ) ) {
+	if ( kestrel_courier_block_core_featured_story_template_uses_featured_image( $block->inner_blocks ) ) {
 		update_post_thumbnail_cache( $query );
 	}
 
@@ -146,17 +146,18 @@ function render_block_kestrel_courier_saucy_story_template( $attributes, $conten
 }
 
 /**
- * Registers the `kestrel-courier/saucy-story-template` block on the server.
+ * Registers the `kestrel-courier/featured-story-template` block on the server.
  *
  * @since 5.8.0
  */
-function register_block_kestrel_courier_saucy_story_template() {
+function register_block_kestrel_courier_featured_story_template() {
 	register_block_type_from_metadata(
-		dirname( __DIR__, 3 ) . '/build/blocks/post-template',
+		dirname( __DIR__, 3 ) . '/build/blocks/featured-story-template',
 		array(
-			'render_callback'   => 'render_block_kestrel_courier_saucy_story_template',
+			'render_callback'   => 'render_block_kestrel_courier_featured_story_template',
 			'skip_inner_blocks' => true,
 		)
 	);
 }
-add_action( 'init', 'register_block_kestrel_courier_saucy_story_template' );
+add_action( 'init', 'register_block_kestrel_courier_featured_story_template' );
+

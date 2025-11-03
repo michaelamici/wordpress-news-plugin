@@ -14,7 +14,7 @@
  *
  * @return bool Whether the block list contains a block that uses the featured image.
  */
-function block_core_breaking_news_template_uses_featured_image( $inner_blocks ) {
+function kestrel_courier_block_core_breaking_news_template_uses_featured_image( $inner_blocks ) {
 	foreach ( $inner_blocks as $block ) {
 		if ( 'core/post-featured-image' === $block->name ) {
 			return true;
@@ -25,7 +25,7 @@ function block_core_breaking_news_template_uses_featured_image( $inner_blocks ) 
 		) {
 			return true;
 		}
-		if ( $block->inner_blocks && block_core_breaking_news_template_uses_featured_image( $block->inner_blocks ) ) {
+		if ( $block->inner_blocks && kestrel_courier_block_core_breaking_news_template_uses_featured_image( $block->inner_blocks ) ) {
 			return true;
 		}
 	}
@@ -76,7 +76,7 @@ function render_block_kestrel_courier_breaking_news_template( $attributes, $cont
 		return '';
 	}
 
-	if ( block_core_breaking_news_template_uses_featured_image( $block->inner_blocks ) ) {
+	if ( kestrel_courier_block_core_breaking_news_template_uses_featured_image( $block->inner_blocks ) ) {
 		update_post_thumbnail_cache( $query );
 	}
 
@@ -152,7 +152,7 @@ function render_block_kestrel_courier_breaking_news_template( $attributes, $cont
  */
 function register_block_kestrel_courier_breaking_news_template() {
 	register_block_type_from_metadata(
-		dirname( __DIR__, 3 ) . '/build/blocks/post-template-breaking',
+		dirname( __DIR__, 3 ) . '/build/blocks/breaking-news-template',
 		array(
 			'render_callback'   => 'render_block_kestrel_courier_breaking_news_template',
 			'skip_inner_blocks' => true,

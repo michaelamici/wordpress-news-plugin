@@ -9,23 +9,20 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	useInnerBlocksProps,
-	privateApis as blockEditorPrivateApis,
 	BlockControls,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
+import { SelectControl } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import EnhancedPaginationControl from './inspector-controls/enhanced-pagination-control';
-import { unlock } from '../../lock-unlock';
 import QueryInspectorControls from './inspector-controls';
 import EnhancedPaginationModal from './enhanced-pagination-modal';
 import { getQueryContextFromTemplate } from '../utils';
 import QueryToolbar from './query-toolbar';
-
-const { HTMLElementControl } = unlock( blockEditorPrivateApis );
 
 const DEFAULTS_POSTS_PER_PAGE = 3;
 
@@ -161,18 +158,18 @@ export default function QueryContent( {
 				/>
 			</InspectorControls>
 			<InspectorControls group="advanced">
-				<HTMLElementControl
-					tagName={ TagName }
-					onChange={ ( value ) =>
-						setAttributes( { tagName: value } )
-					}
-					clientId={ clientId }
+				<SelectControl
+					label={ __( 'HTML element' ) }
+					value={ TagName }
 					options={ [
 						{ label: __( 'Default (<div>)' ), value: 'div' },
 						{ label: '<main>', value: 'main' },
 						{ label: '<section>', value: 'section' },
 						{ label: '<aside>', value: 'aside' },
 					] }
+					onChange={ ( value ) =>
+						setAttributes( { tagName: value } )
+					}
 				/>
 				<EnhancedPaginationControl
 					enhancedPagination={ enhancedPagination }

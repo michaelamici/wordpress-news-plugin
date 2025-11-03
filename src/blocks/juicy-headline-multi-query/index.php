@@ -96,13 +96,41 @@ function render_block_kestrel_courier_juicy_headline_multi_query( $attributes, $
  */
 function register_block_kestrel_courier_juicy_headline_multi_query() {
 	register_block_type_from_metadata(
-		dirname( __DIR__, 3 ) . '/build/blocks/query',
+		dirname( __DIR__, 3 ) . '/build/blocks/juicy-headline-multi-query',
 		array(
 			'render_callback' => 'render_block_kestrel_courier_juicy_headline_multi_query',
 		)
 	);
 }
 add_action( 'init', 'register_block_kestrel_courier_juicy_headline_multi_query' );
+
+/**
+ * Ensure the block is available in all post types that support the block editor.
+ *
+ * @param array $allowed_block_types Array of allowed block types. Default is all block types.
+ * @param object $post The post object.
+ * @return array Modified array of allowed block types.
+ */
+function kestrel_courier_allow_query_block_in_posts( $allowed_block_types, $post ) {
+	if ( ! $post ) {
+		return $allowed_block_types;
+	}
+	
+	// Ensure the block is always available if post type supports editor
+	if ( post_type_supports( $post->post_type, 'editor' ) ) {
+		if ( ! is_array( $allowed_block_types ) ) {
+			// If all blocks are allowed, return null to keep that behavior
+			return $allowed_block_types;
+		}
+		// Add our block to the allowed list if a filter is restricting blocks
+		if ( ! in_array( 'kestrel-courier/juicy-headline-multi-query', $allowed_block_types, true ) ) {
+			$allowed_block_types[] = 'kestrel-courier/juicy-headline-multi-query';
+		}
+	}
+	
+	return $allowed_block_types;
+}
+add_filter( 'allowed_block_types_all', 'kestrel_courier_allow_query_block_in_posts', 10, 2 );
 
 /**
  * Traverse the tree of blocks looking for any plugin block (i.e., a block from
@@ -115,7 +143,7 @@ add_action( 'init', 'register_block_kestrel_courier_juicy_headline_multi_query' 
  * @param array $parsed_block The block being rendered.
  * @return array Returns the parsed block, unmodified.
  */
-function block_core_query_disable_enhanced_pagination( $parsed_block ) {
+function kestrel_courier_block_core_query_disable_enhanced_pagination( $parsed_block ) {
 	static $enhanced_query_stack   = array();
 	static $dirty_enhanced_queries = array();
 	static $render_query_callback  = null;
@@ -183,4 +211,4 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 	return $parsed_block;
 }
 
-add_filter( 'render_block_data', 'block_core_query_disable_enhanced_pagination', 10, 1 );
+add_filter( 'render_block_data', 'kestrel_courier_block_core_query_disable_enhanced_pagination', 10, 1 );

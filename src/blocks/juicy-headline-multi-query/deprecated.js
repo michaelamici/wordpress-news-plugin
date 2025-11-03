@@ -6,15 +6,38 @@ import {
 	InnerBlocks,
 	useInnerBlocksProps,
 	useBlockProps,
-	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../lock-unlock';
-
-const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
+// Utility function to clean empty objects (remove undefined, null, empty object values)
+const cleanEmptyObject = ( obj ) => {
+	if ( ! obj || typeof obj !== 'object' ) {
+		return obj;
+	}
+	const cleaned = {};
+	let hasValues = false;
+	for ( const [ key, value ] of Object.entries( obj ) ) {
+		if ( value !== undefined && value !== null ) {
+			if ( typeof value === 'object' && ! Array.isArray( value ) ) {
+				const cleanedValue = cleanEmptyObject( value );
+				if (
+					cleanedValue !== undefined &&
+					cleanedValue !== null &&
+					Object.keys( cleanedValue ).length > 0
+				) {
+					cleaned[ key ] = cleanedValue;
+					hasValues = true;
+				}
+			} else if ( value !== '' || Array.isArray( value ) ) {
+				cleaned[ key ] = value;
+				hasValues = true;
+			}
+		}
+	}
+	return hasValues ? cleaned : undefined;
+};
 
 const migrateToTaxQuery = ( attributes ) => {
 	const { query } = attributes;
