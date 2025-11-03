@@ -69,7 +69,22 @@ function render_block_kestrel_courier_breaking_news_template( $attributes, $cont
 		}
 	} else {
 		$query_args = build_query_vars_from_query_block( $block, $page );
-		$query      = new WP_Query( $query_args );
+		
+		// Check for offset and posts_per_page in context (set by parent query block for sequential rendering)
+		if ( isset( $block->context['query']['offset'] ) ) {
+			$query_args['offset'] = (int) $block->context['query']['offset'];
+		}
+		if ( isset( $block->context['query']['posts_per_page'] ) ) {
+			$posts_per_page = (int) $block->context['query']['posts_per_page'];
+			// -1 means unlimited, but WP_Query uses -1 differently, so we use a large number
+			if ( -1 === $posts_per_page ) {
+				$query_args['posts_per_page'] = 999; // Large number to get all remaining posts
+			} else {
+				$query_args['posts_per_page'] = $posts_per_page;
+			}
+		}
+		
+		$query = new WP_Query( $query_args );
 	}
 
 	if ( ! $query->have_posts() ) {

@@ -50,9 +50,84 @@ function render_block_kestrel_courier_juicy_headline_multi_query( $attributes, $
 	
 	if ( count( $template_blocks ) > 1 ) {
 		// Multiple templates: render with sequential assignment.
-		// For now, we'll let each template render normally (they'll all render all posts).
-		// TODO: Implement proper sequential post assignment per template.
-		// This requires modifying template context to pass offset/limit per template.
+		// Identify template types and assign offset/limit via context.
+		$template_configs = array();
+		$current_offset = 0;
+		
+		foreach ( $template_blocks as $template_block ) {
+			$template_name = $template_block->name;
+			
+			if ( 'kestrel-courier/featured-story-template' === $template_name ) {
+				$template_configs[] = array(
+					'block' => $template_block,
+					'offset' => $current_offset,
+					'posts_per_page' => 1,
+				);
+				$current_offset += 1;
+			} elseif ( 'kestrel-courier/breaking-news-template' === $template_name ) {
+				$template_configs[] = array(
+					'block' => $template_block,
+					'offset' => $current_offset,
+					'posts_per_page' => 1,
+				);
+				$current_offset += 1;
+			} elseif ( 'kestrel-courier/saucy-story-template' === $template_name ) {
+				$template_configs[] = array(
+					'block' => $template_block,
+					'offset' => $current_offset,
+					'posts_per_page' => -1, // Unlimited - render remaining posts
+				);
+				// Don't increment offset for saucy template as it handles the rest
+			}
+		}
+		
+		// Manually render each template with modified context
+		$rendered_content = '';
+		foreach ( $template_configs as $config ) {
+			$template_block = $config['block'];
+			
+			// Get the parsed block array
+			$template_block_parsed = $template_block->parsed_block;
+			if ( ! isset( $template_block_parsed['blockName'] ) ) {
+				// Fallback: construct parsed block from block object
+				$template_block_parsed = array(
+					'blockName' => $template_block->name,
+					'attrs' => isset( $template_block->attributes ) ? $template_block->attributes : array(),
+					'innerBlocks' => isset( $template_block->inner_blocks ) && $template_block->inner_blocks 
+						? array_map( 
+							function( $inner ) {
+								return isset( $inner->parsed_block ) ? $inner->parsed_block : array();
+							}, 
+							iterator_to_array( $template_block->inner_blocks ) 
+						) 
+						: array(),
+				);
+			}
+			
+			// Create a new block instance with modified context
+			// Copy context and add offset/posts_per_page to query context
+			$modified_context = $block->context;
+			
+			// Build query context: start with context if available, then merge attributes
+			$query_context = isset( $modified_context['query'] ) ? $modified_context['query'] : array();
+			if ( isset( $attributes['query'] ) && is_array( $attributes['query'] ) ) {
+				$query_context = array_merge( $attributes['query'], $query_context );
+			}
+			
+			// Add offset and posts_per_page to query context
+			$query_context['offset'] = $config['offset'];
+			$query_context['posts_per_page'] = $config['posts_per_page'];
+			
+			$modified_context['query'] = $query_context;
+			
+			// Render the template block with modified context
+			$template_block_instance = new WP_Block( $template_block_parsed, $modified_context );
+			$rendered_content .= $template_block_instance->render();
+		}
+		
+		// Wrap the content in the query block wrapper
+		$wrapper_attributes = get_block_wrapper_attributes();
+		$content = '<' . ( isset( $attributes['tagName'] ) ? esc_attr( $attributes['tagName'] ) : 'div' ) . ' ' . $wrapper_attributes . '>' . $rendered_content . '</' . ( isset( $attributes['tagName'] ) ? esc_attr( $attributes['tagName'] ) : 'div' ) . '>';
 	}
 
 	// Enqueue the script module and add the necessary directives if the block is
