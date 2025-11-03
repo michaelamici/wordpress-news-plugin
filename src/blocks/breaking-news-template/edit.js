@@ -44,7 +44,7 @@ function PostTemplateInnerBlocks( { classList } ) {
 		{ className: clsx( 'wp-block-post', classList ) },
 		{ template: TEMPLATE, __unstableDisableLayoutClassNames: true }
 	);
-	return <li { ...innerBlocksProps } />;
+	return <div { ...innerBlocksProps } />;
 }
 
 function PostTemplateBlockPreview( {
@@ -70,10 +70,9 @@ function PostTemplateBlockPreview( {
 	};
 
 	return (
-		<li
+		<div
 			{ ...blockPreviewProps }
 			tabIndex={ 0 }
-			// eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role
 			role="button"
 			onClick={ handleOnClick }
 			onKeyPress={ handleOnClick }
@@ -335,46 +334,50 @@ export default function PostTemplateEdit( {
 		},
 	];
 
-	// To avoid flicker when switching active block contexts, a preview is rendered
-	// for each block context, but the preview for the active block context is hidden.
-	// This ensures that when it is displayed again, the cached rendering of the
-	// block preview is used, instead of having to re-render the preview from scratch.
+	// Breaking news displays articles side by side using columns structure
+	// The columns block is hidden from list view via CSS
 	return (
 		<>
 			<BlockControls>
 				<ToolbarGroup controls={ displayLayoutControls } />
 			</BlockControls>
 
-			<ul { ...blockProps }>
+			<div 
+				{ ...blockProps }
+				className={ clsx( blockProps.className, 'wp-block-columns has-2-columns' ) }
+				style={ { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1em' } }
+			>
 				{ blockContexts &&
-					blockContexts.map( ( blockContext ) => (
+					blockContexts.map( ( blockContext, index ) => (
 						<BlockContextProvider
 							key={ blockContext.postId }
 							value={ blockContext }
 						>
-							{ blockContext.postId ===
-							( activeBlockContextId ||
-								blockContexts[ 0 ]?.postId ) ? (
-								<PostTemplateInnerBlocks
+							<div className="wp-block-column">
+								{ blockContext.postId ===
+								( activeBlockContextId ||
+									blockContexts[ 0 ]?.postId ) ? (
+									<PostTemplateInnerBlocks
+										classList={ blockContext.classList }
+									/>
+								) : null }
+								<MemoizedPostTemplateBlockPreview
+									blocks={ blocks }
+									blockContextId={ blockContext.postId }
 									classList={ blockContext.classList }
+									setActiveBlockContextId={
+										setActiveBlockContextId
+									}
+									isHidden={
+										blockContext.postId ===
+										( activeBlockContextId ||
+											blockContexts[ 0 ]?.postId )
+									}
 								/>
-							) : null }
-							<MemoizedPostTemplateBlockPreview
-								blocks={ blocks }
-								blockContextId={ blockContext.postId }
-								classList={ blockContext.classList }
-								setActiveBlockContextId={
-									setActiveBlockContextId
-								}
-								isHidden={
-									blockContext.postId ===
-									( activeBlockContextId ||
-										blockContexts[ 0 ]?.postId )
-								}
-							/>
+							</div>
 						</BlockContextProvider>
 					) ) }
-			</ul>
+			</div>
 		</>
 	);
 }

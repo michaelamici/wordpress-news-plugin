@@ -118,7 +118,10 @@ function render_block_kestrel_courier_breaking_news_template( $attributes, $cont
 		$classnames .= ' ' . sanitize_title( 'columns-' . $attributes['layout']['columnCount'] );
 	}
 
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => trim( $classnames ) ) );
+	// Wrap in columns structure for side-by-side display
+	$wrapper_attributes_array = array( 'class' => trim( $classnames . ' wp-block-columns has-2-columns' ) );
+	$wrapper_attributes_array['style'] = 'display: grid; grid-template-columns: 1fr 1fr; gap: 1em;';
+	$wrapper_attributes = get_block_wrapper_attributes( $wrapper_attributes_array );
 
 	$content = '';
 	while ( $query->have_posts() ) {
@@ -146,12 +149,12 @@ function render_block_kestrel_courier_breaking_news_template( $attributes, $cont
 		$block_content = ( new WP_Block( $block_instance ) )->render( array( 'dynamic' => false ) );
 		remove_filter( 'render_block_context', $filter_block_context, 1 );
 
-		// Wrap the render inner blocks in a `li` element with the appropriate post classes.
-		$post_classes = implode( ' ', get_post_class( 'wp-block-post' ) );
+		// Wrap the render inner blocks in a `div` element (column) with the appropriate post classes.
+		$post_classes = implode( ' ', get_post_class( 'wp-block-post wp-block-column' ) );
 
 		$inner_block_directives = $enhanced_pagination ? ' data-wp-key="post-template-item-' . $post_id . '"' : '';
 
-		$content .= '<li' . $inner_block_directives . ' class="' . esc_attr( $post_classes ) . '">' . $block_content . '</li>';
+		$content .= '<div' . $inner_block_directives . ' class="' . esc_attr( $post_classes ) . '">' . $block_content . '</div>';
 	}
 
 	/*
@@ -162,7 +165,7 @@ function render_block_kestrel_courier_breaking_news_template( $attributes, $cont
 	wp_reset_postdata();
 
 	return sprintf(
-		'<ul %1$s>%2$s</ul>',
+		'<div %1$s>%2$s</div>',
 		$wrapper_attributes,
 		$content
 	);
