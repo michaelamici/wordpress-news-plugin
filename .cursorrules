@@ -139,6 +139,19 @@
 
 * PHPUnit: unit tests for Front logic and helpers; integration tests for hooks.
 
+## Gutenberg Submodule (Reference Only)
+
+* The `gutenberg/` directory in the root of this repo is a Git submodule for **reference only**.
+* **DO NOT** modify files in the gutenberg submodule.
+* **DO NOT** use it for production builds or runtime dependencies.
+* **DO** use it to reference:
+  * Source code patterns and architecture
+  * Test examples and structures
+  * Documentation and implementation details
+  * Block registration patterns
+* For production, use published npm packages (e.g., `@wordpress/e2e-test-utils-playwright`) instead of file dependencies pointing to the submodule.
+* When copying code from gutenberg, always adapt it for this plugin's structure and never import directly from gutenberg paths.
+
 ## File Layout (planned)
 
 * `news.php` — bootstrap, hooks.

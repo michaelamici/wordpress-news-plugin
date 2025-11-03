@@ -15,4 +15,10 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+// Register blocks
+require_once plugin_dir_path(__FILE__) . 'src/blocks/query/index.php';
+require_once plugin_dir_path(__FILE__) . 'src/blocks/post-template/index.php';
+require_once plugin_dir_path(__FILE__) . 'src/blocks/post-template-breaking/index.php';
+require_once plugin_dir_path(__FILE__) . 'src/blocks/post-template-featured/index.php';
+
 // Plugin initialized.
