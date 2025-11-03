@@ -152,7 +152,7 @@ function render_block_kestrel_courier_breaking_news_template( $attributes, $cont
  */
 function register_block_kestrel_courier_breaking_news_template() {
 	register_block_type_from_metadata(
-		__DIR__,
+		dirname( __DIR__, 3 ) . '/build/blocks/post-template-breaking',
 		array(
 			'render_callback'   => 'render_block_kestrel_courier_breaking_news_template',
 			'skip_inner_blocks' => true,

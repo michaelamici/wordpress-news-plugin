@@ -96,7 +96,7 @@ function render_block_kestrel_courier_juicy_headline_multi_query( $attributes, $
  */
 function register_block_kestrel_courier_juicy_headline_multi_query() {
 	register_block_type_from_metadata(
-		__DIR__,
+		dirname( __DIR__, 3 ) . '/build/blocks/query',
 		array(
 			'render_callback' => 'render_block_kestrel_courier_juicy_headline_multi_query',
 		)
