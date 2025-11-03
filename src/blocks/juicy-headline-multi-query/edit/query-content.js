@@ -26,7 +26,11 @@ import QueryToolbar from './query-toolbar';
 
 const DEFAULTS_POSTS_PER_PAGE = 3;
 
-const TEMPLATE = [ [ 'kestrel-courier/saucy-story-template' ] ];
+const TEMPLATE = [
+	[ 'kestrel-courier/featured-story-template' ],
+	[ 'kestrel-courier/breaking-news-template' ],
+	[ 'kestrel-courier/saucy-story-template' ],
+];
 export default function QueryContent( {
 	attributes,
 	setAttributes,

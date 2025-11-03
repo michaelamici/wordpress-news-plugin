@@ -30,6 +30,53 @@ function find_template_blocks( $inner_blocks ) {
 }
 
 /**
+ * Modifies template block context to add offset/perPage for sequential rendering.
+ *
+ * @param array $context The block context.
+ * @param array $parsed_block The parsed block array.
+ * @return array Modified context.
+ */
+function kestrel_courier_modify_template_context( $context, $parsed_block ) {
+	$block_name = $parsed_block['blockName'] ?? '';
+	if ( ! in_array( $block_name, array( 'kestrel-courier/featured-story-template', 'kestrel-courier/breaking-news-template', 'kestrel-courier/saucy-story-template' ), true ) ) {
+		return $context;
+	}
+	
+	// Check if we're in sequential rendering mode
+	if ( ! isset( $GLOBALS['_juicy_current_query_id'] ) || ! isset( $GLOBALS['_juicy_current_template_index'] ) ) {
+		return $context;
+	}
+	
+	$query_id = $GLOBALS['_juicy_current_query_id'];
+	$template_index = $GLOBALS['_juicy_current_template_index'];
+	
+	if ( ! isset( $GLOBALS['_juicy_template_configs'][ $query_id ] ) ) {
+		return $context;
+	}
+	
+	$config_data = $GLOBALS['_juicy_template_configs'][ $query_id ];
+	$configs = $config_data['configs'];
+	$base_query = $config_data['base_query'];
+	
+	// Get config for this template index
+	if ( isset( $configs[ $template_index ] ) ) {
+		$config = $configs[ $template_index ];
+		
+		// Only apply if this is the right template type
+		if ( $config['name'] === $block_name ) {
+			// Merge base query context
+			$context['query'] = isset( $context['query'] ) ? array_merge( $base_query, $context['query'] ) : $base_query;
+			
+			// Add offset and perPage
+			$context['query']['offset'] = $config['offset'];
+			$context['query']['perPage'] = $config['perPage'];
+		}
+	}
+	
+	return $context;
+}
+
+/**
  * Modifies the static `kestrel-courier/juicy-headline-multi-query` block on the server.
  *
  * @since 6.4.0
@@ -49,81 +96,97 @@ function render_block_kestrel_courier_juicy_headline_multi_query( $attributes, $
 	$template_blocks = find_template_blocks( $block->inner_blocks );
 	
 	if ( count( $template_blocks ) > 1 ) {
-		// Multiple templates: render with sequential assignment.
-		// Identify template types and assign offset/limit via context.
-		$template_configs = array();
+		// Multiple templates: use filter to modify template context before rendering
+		// Store template configs globally keyed by query ID
+		$query_id = isset( $attributes['queryId'] ) ? $attributes['queryId'] : 'default-' . wp_unique_id();
+		
+		// Build query context from parent block
+		$base_query_context = isset( $block->context['query'] ) ? $block->context['query'] : array();
+		if ( isset( $attributes['query'] ) && is_array( $attributes['query'] ) ) {
+			$base_query_context = array_merge( $attributes['query'], $base_query_context );
+		}
+		
+		// Calculate offsets for each template in order
 		$current_offset = 0;
+		$template_configs = array();
 		
 		foreach ( $template_blocks as $template_block ) {
 			$template_name = $template_block->name;
 			
 			if ( 'kestrel-courier/featured-story-template' === $template_name ) {
 				$template_configs[] = array(
-					'block' => $template_block,
+					'name' => $template_name,
 					'offset' => $current_offset,
-					'posts_per_page' => 1,
+					'perPage' => 1,
 				);
 				$current_offset += 1;
 			} elseif ( 'kestrel-courier/breaking-news-template' === $template_name ) {
 				$template_configs[] = array(
-					'block' => $template_block,
+					'name' => $template_name,
 					'offset' => $current_offset,
-					'posts_per_page' => 1,
+					'perPage' => 1,
 				);
 				$current_offset += 1;
 			} elseif ( 'kestrel-courier/saucy-story-template' === $template_name ) {
 				$template_configs[] = array(
-					'block' => $template_block,
+					'name' => $template_name,
 					'offset' => $current_offset,
-					'posts_per_page' => -1, // Unlimited - render remaining posts
+					'perPage' => -1, // Unlimited - render remaining posts
 				);
-				// Don't increment offset for saucy template as it handles the rest
 			}
 		}
 		
-		// Manually render each template with modified context
-		$rendered_content = '';
-		foreach ( $template_configs as $config ) {
-			$template_block = $config['block'];
-			
-			// Get the parsed block array
-			$template_block_parsed = $template_block->parsed_block;
-			if ( ! isset( $template_block_parsed['blockName'] ) ) {
-				// Fallback: construct parsed block from block object
-				$template_block_parsed = array(
-					'blockName' => $template_block->name,
-					'attrs' => isset( $template_block->attributes ) ? $template_block->attributes : array(),
-					'innerBlocks' => isset( $template_block->inner_blocks ) && $template_block->inner_blocks 
-						? array_map( 
-							function( $inner ) {
-								return isset( $inner->parsed_block ) ? $inner->parsed_block : array();
-							}, 
-							iterator_to_array( $template_block->inner_blocks ) 
-						) 
-						: array(),
-				);
-			}
-			
-			// Create a new block instance with modified context
-			// Copy context and add offset/posts_per_page to query context
-			$modified_context = $block->context;
-			
-			// Build query context: start with context if available, then merge attributes
-			$query_context = isset( $modified_context['query'] ) ? $modified_context['query'] : array();
-			if ( isset( $attributes['query'] ) && is_array( $attributes['query'] ) ) {
-				$query_context = array_merge( $attributes['query'], $query_context );
-			}
-			
-			// Add offset and perPage to query context (perPage is the WordPress convention)
-			$query_context['offset'] = $config['offset'];
-			$query_context['perPage'] = $config['posts_per_page'];
-			
-			$modified_context['query'] = $query_context;
-			
-			// Render the template block with modified context
-			$template_block_instance = new WP_Block( $template_block_parsed, $modified_context );
-			$rendered_content .= $template_block_instance->render();
+		// Store configs for this query ID
+		$GLOBALS['_juicy_template_configs'][ $query_id ] = array(
+			'configs' => $template_configs,
+			'base_query' => $base_query_context,
+		);
+		
+		// Add filter to modify template context (only if not already added)
+		if ( ! has_filter( 'render_block_context', 'kestrel_courier_modify_template_context' ) ) {
+			add_filter( 'render_block_context', 'kestrel_courier_modify_template_context', 10, 2 );
 		}
+		
+		// Re-render inner blocks with modified context
+		$rendered_content = '';
+		$template_index = 0;
+		foreach ( $template_blocks as $template_block ) {
+			if ( isset( $template_configs[ $template_index ] ) ) {
+				$config = $template_configs[ $template_index ];
+				
+				// Build modified context for this template
+				$modified_context = $block->context;
+				$modified_context['query'] = isset( $modified_context['query'] ) ? array_merge( $base_query_context, $modified_context['query'] ) : $base_query_context;
+				$modified_context['query']['offset'] = $config['offset'];
+				$modified_context['query']['perPage'] = $config['perPage'];
+				
+				// Preserve other context values
+				if ( isset( $attributes['queryId'] ) ) {
+					$modified_context['queryId'] = $attributes['queryId'];
+				}
+				if ( isset( $attributes['enhancedPagination'] ) ) {
+					$modified_context['enhancedPagination'] = $attributes['enhancedPagination'];
+				}
+				if ( isset( $block->context['displayLayout'] ) ) {
+					$modified_context['displayLayout'] = $block->context['displayLayout'];
+				}
+				
+				// Store current template index in global for filter (in case nested blocks need it)
+				$GLOBALS['_juicy_current_template_index'] = $template_index;
+				$GLOBALS['_juicy_current_query_id'] = $query_id;
+				
+				// Render this template block with modified context
+				$template_instance = new WP_Block( $template_block->parsed_block, $modified_context );
+				$rendered_content .= $template_instance->render();
+				
+				$template_index++;
+			}
+		}
+		
+		// Clean up globals
+		unset( $GLOBALS['_juicy_current_template_index'] );
+		unset( $GLOBALS['_juicy_current_query_id'] );
+		unset( $GLOBALS['_juicy_template_configs'][ $query_id ] );
 		
 		// Wrap the content in the query block wrapper
 		$wrapper_attributes = get_block_wrapper_attributes();
